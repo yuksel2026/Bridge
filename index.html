@@ -1,0 +1,3172 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d20">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Briç">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-apple-180.png">
+<title>Briç — Standart Beşli Majör</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#0b3d20;--felt2:#0e4a27;
+  --gold:#c9a84c;--gold2:#e8c97a;--gdim:rgba(201,168,76,0.18);
+  --cream:#f5edd8;--muted:rgba(245,237,216,0.48);
+  --red:#c0392b;--card-bg:#fdfaf3;
+  --panel:rgba(0,0,0,0.42);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:#061a0d;font-family:'EB Garamond',Georgia,serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:18px 10px 50px;color:var(--cream);
+}
+h1{
+  font-family:'Playfair Display',serif;font-size:19px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;margin-bottom:2px;
+  text-shadow:0 2px 14px rgba(201,168,76,0.45);
+}
+.signature{
+  font-family:'EB Garamond',Georgia,serif;font-style:italic;font-size:12px;
+  letter-spacing:1.5px;color:#ffffff;
+  margin-bottom:12px;opacity:0.85;
+}
+.info-bar{
+  display:flex;align-items:center;gap:16px;
+  background:rgba(0,0,0,0.4);border:1px solid var(--gdim);
+  border-radius:8px;padding:6px 16px;margin-bottom:12px;
+  font-family:'Playfair Display',serif;font-size:12px;
+  width:1000px;max-width:100%;flex-wrap:wrap;
+}
+.ib-deal{color:var(--muted);letter-spacing:1px;}
+.ib-dealer{color:var(--gold2);font-weight:600;letter-spacing:1px;}
+.ib-vul{padding:2px 10px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:1px;}
+.ib-vul.none{background:rgba(80,160,80,0.15);color:#7dd87d;border:1px solid rgba(80,160,80,0.3);}
+.ib-vul.ns{background:rgba(200,60,60,0.15);color:#e07070;border:1px solid rgba(200,60,60,0.3);}
+.ib-vul.ew{background:rgba(200,100,40,0.15);color:#e0a070;border:1px solid rgba(200,100,40,0.3);}
+.ib-vul.both{background:rgba(180,50,50,0.2);color:#e05050;border:1px solid rgba(180,50,50,0.4);}
+.ib-score{margin-left:auto;display:flex;gap:10px;align-items:center;}
+.ib-ns{color:#7dd87d;font-size:13px;font-weight:700;}
+.ib-ew{color:#e07070;font-size:13px;font-weight:700;}
+.ib-sep{color:var(--muted);}
+
+/* ── BIDDING TABLE ── */
+.bid-table-wrap{
+  background:radial-gradient(ellipse at center,var(--felt2) 0%,var(--felt) 55%,#082912 100%);
+  border:8px solid #071f0d;border-radius:80px;
+  outline:3px solid var(--gold);outline-offset:-13px;
+  padding:26px 16px;
+  display:grid;
+  grid-template-areas:". north ." "west center east" ". south .";
+  grid-template-columns:235px 1fr 235px;
+  grid-template-rows:auto 1fr auto;
+  gap:8px;width:1000px;max-width:100%;
+  box-shadow:0 0 0 10px #040c06,0 28px 80px rgba(0,0,0,0.95);
+}
+.area{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.area.north{grid-area:north;}
+.area.south{grid-area:south;}
+.area.west{grid-area:west;}
+.area.east{grid-area:east;}
+.center{grid-area:center;display:flex;flex-direction:column;gap:7px;}
+.ew-container{display:flex;align-items:center;justify-content:center;}
+.lbl{font-family:'Playfair Display',serif;font-size:10px;letter-spacing:2.5px;color:var(--gold);margin-bottom:5px;text-transform:uppercase;opacity:.75;}
+.lbl.you{color:var(--gold2);opacity:1;font-size:11px;}
+
+/* ── CARDS (bidding phase) ── */
+.hand{display:flex;align-items:flex-start;justify-content:center;padding-left:44px;min-height:118px;position:relative;}
+.card{
+  width:72px;height:105px;background:var(--card-bg);
+  border-radius:7px;border:1px solid #c0b89a;margin-left:-48px;
+  padding:5px 6px;box-shadow:-3px 0 9px rgba(0,0,0,0.5);
+  font-family:'Playfair Display',serif;font-weight:600;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;transition:transform .14s;cursor:default;flex-shrink:0;z-index:1;
+}
+.card:first-child{margin-left:0;}
+.card:hover{transform:translateY(-12px);z-index:30;}
+.rank{font-size:15px;line-height:1.15;display:flex;flex-direction:column;align-items:flex-start;gap:1px;}.rank .rsym{font-size:19px;line-height:1;margin-top:1px;}
+.sym{font-size:28px;text-align:center;line-height:1;}
+.card.back{background:linear-gradient(140deg,#1b3c70 0%,#112a52 60%,#0d2040 100%);border-color:#223a80;}
+.card.back::after{content:'';position:absolute;inset:5px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);}
+
+/* ── CENTER (bidding) ── */
+.strip{background:rgba(0,0,0,0.28);border-radius:8px;padding:5px 10px;display:flex;gap:14px;align-items:center;border:1px solid var(--gdim);flex-wrap:wrap;font-size:12px;}
+.si{display:flex;gap:4px;align-items:center;}
+.sl{color:var(--muted);font-size:10px;}
+.sv{color:var(--gold2);font-family:'Playfair Display',serif;font-size:14px;font-weight:600;}
+.log-wrap{background:var(--panel);border-radius:10px;padding:9px;border:1px solid rgba(255,255,255,0.06);overflow-y:auto;max-height:175px;}
+.logt{width:100%;border-collapse:collapse;text-align:center;font-size:13px;}
+.logt th{font-family:'Playfair Display',serif;color:var(--gold);font-size:10px;letter-spacing:2px;padding:4px;border-bottom:1px solid rgba(201,168,76,0.28);text-transform:uppercase;}
+.logt td{padding:3px 4px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.logt tr:last-child td{border-bottom:none;}
+.you-col{background:rgba(201,168,76,0.07);}
+.bc{font-family:'Playfair Display',serif;font-weight:700;font-size:14px;}
+.bpass{color:var(--muted);font-size:10px;font-style:italic;}
+.bdbl{color:#f0d060;}.brdbl{color:#e05252;}
+.bred{color:#d94040;}.bblk{color:#ccc5b0;}
+
+/* ── CONTROLS ── */
+.ctrl{background:rgba(0,0,0,0.33);border-radius:10px;padding:11px;border:1px solid rgba(255,255,255,0.06);}
+.row1,.row2{display:flex;gap:3px;justify-content:center;margin-bottom:6px;}
+.bl,.bs{width:33px;height:33px;border:1px solid rgba(201,168,76,0.28);border-radius:5px;background:rgba(201,168,76,0.05);color:var(--cream);font-family:'Playfair Display',serif;font-size:13px;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center;}
+.bl:hover:not(:disabled),.bs:hover:not(:disabled){background:rgba(201,168,76,0.16);border-color:var(--gold);}
+.bl.on,.bs.on{background:var(--gold);color:#111;border-color:var(--gold2);font-weight:700;}
+.bl:disabled,.bs:disabled{opacity:.13;cursor:not-allowed;}
+.bs.red{color:var(--red);}.bs.red.on{color:var(--red);}
+.row3{display:flex;gap:5px;justify-content:center;}
+.btn{padding:8px 0;width:80px;border-radius:7px;border:none;font-family:'Playfair Display',serif;font-size:11px;letter-spacing:.8px;cursor:pointer;transition:all .14s;text-transform:uppercase;}
+.btn:active{transform:scale(.96);}
+.btn:disabled{opacity:.17;cursor:not-allowed;}
+.btn-bid{background:#1b5e30;color:var(--gold2);border:1px solid #2d8044;}
+.btn-bid:hover:not(:disabled){background:#1f7038;}
+.btn-pas{background:#3d1010;color:#e88;border:1px solid #6a2020;}
+.btn-pas:hover{background:#4a1414;}
+.btn-dbl{background:#3c2800;color:var(--gold2);border:1px solid #694500;}
+.btn-dbl:hover:not(:disabled){background:#4a3200;}
+.btn-rdbl{background:#3c1028;color:#e882aa;border:1px solid #7a2050;}
+.btn-rdbl:hover:not(:disabled){background:#4a1432;}
+.cv{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold2);font-weight:600;}
+.thinking{text-align:center;font-style:italic;font-size:11px;color:var(--muted);padding:2px;display:none;animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+.anl{display:none;background:rgba(0,0,0,0.52);border-radius:10px;padding:13px;border-top:2px solid var(--gold);font-size:12.5px;line-height:1.85;max-height:240px;overflow-y:auto;}
+.anl-title{font-family:'Playfair Display',serif;color:var(--gold);font-size:13px;letter-spacing:1px;margin-bottom:9px;border-bottom:1px solid var(--gdim);padding-bottom:5px;}
+.anl-section{margin-bottom:9px;}
+.anl-label{color:var(--gold2);font-size:10px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;}
+.chip{display:inline-block;background:rgba(201,168,76,0.11);border:1px solid var(--gdim);border-radius:3px;padding:0 7px;margin:1px 2px;font-family:'Playfair Display',serif;font-size:13px;}
+.btn-new{display:none;width:100%;margin-top:7px;padding:10px;background:rgba(22,88,56,0.68);color:var(--gold2);border:1px solid rgba(201,168,76,0.38);border-radius:8px;font-family:'Playfair Display',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.18s;}
+.btn-new:hover{background:rgba(28,108,68,0.8);}
+.btn-redeal{background:rgba(40,40,40,0.7);color:var(--muted);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 16px;font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1px;cursor:pointer;transition:.15s;}
+.btn-redeal:hover{background:rgba(80,40,10,0.7);color:var(--gold);border-color:rgba(201,168,76,0.3);}
+/* Bid explanation */
+.bid-explain{
+  background:rgba(0,0,0,0.38);border-radius:8px;padding:7px 10px;
+  border-left:3px solid var(--gold);font-size:12px;line-height:1.65;
+  max-height:160px;overflow-y:auto;display:none;
+}
+.be-entry{
+  display:flex;gap:6px;align-items:baseline;
+  padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  font-size:12px;
+}
+.be-entry:last-child{border-bottom:none;}
+.be-seat{
+  font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
+  flex-shrink:0;min-width:18px;
+}
+.be-bid-tag{
+  font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
+  color:var(--gold2);flex-shrink:0;min-width:36px;
+}
+.be-text{color:var(--cream);opacity:.85;font-size:11.5px;line-height:1.5;}
+.be-seat.ns{color:#7dd87d;}
+.be-seat.ew{color:#e07070;}
+
+/* ═══════════════ PLAY PHASE ═══════════════ */
+.play-wrap{display:none;flex-direction:column;align-items:center;gap:10px;width:1040px;max-width:100%;}
+.play-wrap.active{display:flex;}
+
+.play-felt{
+  background:radial-gradient(ellipse at center,var(--felt2) 0%,var(--felt) 55%,#082912 100%);
+  border:8px solid #071f0d;border-radius:80px;
+  outline:3px solid var(--gold);outline-offset:-13px;
+  padding:20px 14px;
+  display:grid;
+  grid-template-areas:". pdecl ." "pdef1 ptrick pdef2" ". pdummy .";
+  grid-template-columns:260px 1fr 260px;
+  grid-template-rows:auto 320px auto;
+  gap:8px;width:100%;
+  box-shadow:0 0 0 10px #040c06,0 28px 80px rgba(0,0,0,0.95);
+}
+
+.parea{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.parea.pdecl{grid-area:pdecl;}
+.parea.pdummy{grid-area:pdummy;}
+.parea.pdef1{grid-area:pdef1;}
+.parea.pdef2{grid-area:pdef2;}
+.ptrick-area{grid-area:ptrick;position:relative;display:flex;align-items:center;justify-content:center;}
+
+.turn-badge{font-family:'Playfair Display',serif;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;background:rgba(201,168,76,0.06);border-radius:4px;padding:2px 8px;border:1px solid rgba(201,168,76,0.15);transition:all .3s;}
+.turn-badge.active-turn{color:var(--gold2);background:rgba(201,168,76,0.2);border-color:rgba(201,168,76,0.4);}
+.tricks-ct{font-size:11px;color:var(--muted);font-family:'Playfair Display',serif;}
+
+/* Play cards */
+.pc{
+  width:60px;height:87px;background:var(--card-bg);
+  border-radius:6px;border:1px solid #c0b89a;
+  margin-left:-40px;padding:0;
+  box-shadow:-2px 0 6px rgba(0,0,0,0.45);
+  font-family:'Playfair Display',serif;font-weight:700;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;transition:transform .15s,box-shadow .15s;
+  cursor:default;flex-shrink:0;z-index:1;overflow:hidden;
+}
+.pc:first-child{margin-left:0;}
+.pc.playable{cursor:pointer;border-color:var(--gold);box-shadow:-2px 0 6px rgba(201,168,76,0.3);}
+.pc.playable:hover{transform:translateY(-14px)!important;z-index:50;box-shadow:0 8px 20px rgba(201,168,76,0.5);}
+.pc.back-p{background:linear-gradient(140deg,#1b3c70 0%,#112a52 60%,#0d2040 100%);border-color:#223a80;}
+.pc.back-p::after{content:'';position:absolute;inset:4px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,.03) 3px,rgba(255,255,255,.03) 6px);}
+.pr2{font-size:13px;line-height:1;font-weight:700;display:flex;flex-direction:column;align-items:flex-start;padding:3px 4px 0 4px;gap:2px;}
+.pc-mid{flex:1;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;}
+.pr2b{font-size:13px;line-height:1;font-weight:700;display:flex;flex-direction:column;align-items:flex-end;transform:rotate(180deg);padding:3px 4px 0 4px;gap:2px;}
+.prr{font-size:13px;line-height:1;}
+.prs{font-size:17px;line-height:1;}
+/* Contract info panel */
+.contract-info{
+  position:fixed;bottom:24px;right:24px;
+  background:rgba(5,18,9,0.93);border:1px solid var(--gold);
+  border-radius:12px;padding:12px 16px;min-width:155px;
+  font-family:'Playfair Display',serif;
+  box-shadow:0 4px 24px rgba(0,0,0,0.7);
+  display:none;z-index:200;
+}
+.contract-info.active{display:block;}
+.ci-contract{font-size:22px;font-weight:700;color:var(--gold2);letter-spacing:1px;text-align:center;margin-bottom:4px;}
+.ci-side{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:6px;}
+.ci-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.ci-label{font-size:10px;color:var(--muted);letter-spacing:.5px;}
+.ci-val{font-size:14px;color:var(--cream);font-weight:600;}
+.ci-val.good{color:#5dbb6e;}
+.ci-val.bad{color:#e05252;}
+.ci-progress{margin-top:8px;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;}
+.ci-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .4s ease;}
+
+/* Suit rows */
+.suit-row-p{display:flex;align-items:flex-start;position:relative;margin-bottom:4px;min-height:87px;}
+.side-suit-row-p{display:flex;align-items:flex-start;position:relative;margin-bottom:3px;min-height:72px;}
+.side-suit-row-p .pc{width:50px;height:72px;margin-left:-34px;}
+.side-suit-row-p .pc:first-child{margin-left:0;}
+
+/* Trick center */
+.trick-center{position:relative;width:300px;height:280px;}
+.tcard{
+  position:absolute;width:60px;height:87px;
+  background:var(--card-bg);border-radius:6px;border:1px solid #c0b89a;
+  padding:4px 5px;box-shadow:0 4px 16px rgba(0,0,0,0.6);
+  font-family:'Playfair Display',serif;font-weight:600;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.tcard.tN{top:8px;left:50%;transform:translateX(-50%);}
+.tcard.tS{bottom:8px;left:50%;transform:translateX(-50%);}
+.tcard.tW{left:8px;top:50%;transform:translateY(-50%);}
+.tcard.tE{right:8px;top:50%;transform:translateY(-50%);}
+.trick-mini{width:28px;height:40px;background:linear-gradient(140deg,#1b3c70,#0d2040);border-radius:3px;border:1px solid #223a80;flex-shrink:0;}
+
+/* Score bar */
+.score-bar{display:none;background:rgba(0,0,0,0.5);border-radius:10px;padding:14px 18px;text-align:center;font-size:13px;line-height:1.8;border:1px solid var(--gdim);width:100%;}
+.score-bar.active{display:block;}
+.score-title{font-family:'Playfair Display',serif;color:var(--gold);font-size:15px;letter-spacing:1px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<h1>Briç — Standart Beşli Majör</h1>
+<div class="signature">Powered by Yuksel Akyurek</div>
+<div class="info-bar" id="infoBar">
+  <div class="ib-deal" id="ibDeal">El: 1</div>
+  <div class="ib-dealer" id="ibDealer">Dağıtıcı: Kuzey</div>
+  <div class="ib-vul" id="ibVul">Zone: Yok</div>
+  <div class="ib-score">
+    <span class="ib-ns" id="ibNS">NS: 0</span>
+    <span class="ib-sep">|</span>
+    <span class="ib-ew" id="ibEW">EW: 0</span>
+  </div>
+</div>
+
+<!-- ═══ BIDDING TABLE ═══ -->
+<div class="bid-table-wrap" id="bidWrap">
+  <div class="area north">
+    <div class="lbl you" id="northLbl">Kuzey — Siz</div>
+    <div id="hN" class="hand"></div>
+  </div>
+  <div class="area west">
+    <div class="lbl">Batı (AI)</div>
+    <div id="hW" class="ew-container"></div>
+  </div>
+  <div class="center">
+    <div class="strip">
+      <div class="si"><span class="sl">K-HCP</span><span class="sv" id="vHcp">—</span></div>
+      <div class="si"><span class="sl">Dağılım</span><span class="sv" id="vDist">—</span></div>
+      <div class="si"><span class="sl">Toplam</span><span class="sv" id="vTotal">—</span></div>
+      <div class="si" style="margin-left:auto;flex-direction:column;align-items:flex-end;gap:0;">
+        <span class="sl" style="font-size:9px;">KONTRAT</span>
+        <span class="cv" id="vCont">—</span>
+      </div>
+    </div>
+    <div class="log-wrap">
+      <table class="logt">
+        <thead><tr id="logHead"><th>—</th><th>—</th><th>—</th><th>—</th></tr></thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+    <div class="thinking" id="thinking">AI düşünüyor…</div>
+    <!-- BID EXPLANATION PANEL -->
+    <div class="anl" id="anl"></div>
+    <div class="ctrl" id="ctrl">
+      <div class="row1" id="lvlRow"></div>
+      <div class="row2" id="suitRow"></div>
+      <div class="row3">
+        <button class="btn btn-bid" id="btnBid" onclick="doBid()" disabled>Deklare</button>
+        <button class="btn btn-pas" onclick="doPass()">Pas</button>
+        <button class="btn btn-dbl" id="btnDbl" onclick="doDouble()" disabled>Kontr</button>
+        <button class="btn btn-rdbl" id="btnRdbl" onclick="doRedouble()" disabled>S.Kontr</button>
+      </div>
+      <!-- REDEAL button always visible during bidding -->
+      <div style="margin-top:7px;text-align:center;">
+        <button class="btn-redeal" onclick="startGame()">↺ Bu Eli Yenile</button>
+      </div>
+    </div>
+    <button class="btn-new" id="btnNew" onclick="startGame()">✦ Yeni El Dağıt ✦</button>
+  </div>
+  <div class="area east">
+    <div class="lbl">Doğu (AI)</div>
+    <div id="hE" class="ew-container"></div>
+  </div>
+  <div class="area south">
+    <div id="hS" class="hand"></div>
+    <div style="margin:5px 0;font-size:12px;text-align:center;opacity:.85;">
+      HCP:<b id="sHcp">—</b> | Dağılım:<b id="sDist">—</b> | Toplam:<b id="sTotal" style="color:var(--gold2)">—</b>
+    </div>
+    <div class="lbl you">Güney — Siz (Dağıtıcı)</div>
+  </div>
+</div>
+
+<!-- ═══ PLAY PHASE ═══ -->
+<div class="play-wrap" id="playWrap">
+  <div id="playBanner" style="display:none;width:100%;background:rgba(0,0,0,0.45);border:1px solid var(--gdim);border-radius:8px;padding:7px 14px;font-family:'Playfair Display',serif;font-size:13px;text-align:center;margin-bottom:4px;color:var(--cream);letter-spacing:.5px;"></div>
+<div class="play-felt">
+    <!-- TOP = South (S) — fixed position -->
+    <div class="parea pdecl">
+      <div class="turn-badge" id="pLblS">Güney</div>
+      <div id="ph-S" style="width:100%;"></div>
+      <div class="tricks-ct" id="tc-S"></div>
+    </div>
+    <!-- LEFT = West (W) — fixed position -->
+    <div class="parea pdef1">
+      <div class="turn-badge" id="pLblW">Batı</div>
+      <div id="ph-W-play" style="width:100%;"></div>
+      <div class="tricks-ct" id="tc-W"></div>
+    </div>
+    <!-- CENTER TRICK -->
+    <div class="ptrick-area">
+      <div class="trick-center" id="trickCenter"></div>
+    </div>
+    <!-- RIGHT = East (E) — fixed position -->
+    <div class="parea pdef2">
+      <div class="turn-badge" id="pLblE">Doğu</div>
+      <div id="ph-E-play" style="width:100%;"></div>
+      <div class="tricks-ct" id="tc-E"></div>
+    </div>
+    <!-- BOTTOM = North (N) — user, fixed position -->
+    <div class="parea pdummy">
+      <div id="ph-N" style="width:100%;"></div>
+      <div class="turn-badge" id="pLblN">Kuzey (Siz)</div>
+    </div>
+  </div>
+  <div class="score-bar" id="scoreBar">
+    <div class="score-title">✦ Oyun Sonucu</div>
+    <div id="scoreContent"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="btn-new" style="display:block;flex:2;" onclick="startGame()">✦ Sonraki El ✦</button>
+      <button class="btn-new" style="display:block;flex:1;background:rgba(20,60,90,0.7);border-color:rgba(90,160,200,0.4);color:#80c8e0;font-size:10px;" onclick="revealAllHands()">👁 Tüm Elleri Göster</button>
+      <button class="btn-new" style="display:block;flex:1;background:rgba(60,20,20,0.7);border-color:rgba(200,80,80,0.4);color:#e08080;font-size:10px;" onclick="startGame(true)">Sıfırla</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTRACT INFO PANEL -->
+<div class="contract-info" id="contractInfo">
+  <div class="ci-contract" id="ci-contract">—</div>
+  <div class="ci-side" id="ci-side">—</div>
+  <div class="ci-row">
+    <span class="ci-label">Gerekli el</span>
+    <span class="ci-val" id="ci-need">—</span>
+  </div>
+  <div class="ci-row">
+    <span class="ci-label">Alınan el</span>
+    <span class="ci-val" id="ci-have">—</span>
+  </div>
+  <div class="ci-row">
+    <span class="ci-label">Kalan</span>
+    <span class="ci-val" id="ci-left">—</span>
+  </div>
+  <div class="ci-progress">
+    <div class="ci-bar" id="ci-bar" style="width:0%"></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   KOD KORUMA — caydırıcı önlem (kesin/aşılamaz DEĞİL)
+   Sağ tık ve geliştirici araçları kısayolları engellenir.
+   Teknik bilgisi olan biri yine de tarayıcı menüsünden
+   veya dosyayı doğrudan bir editörle açarak kodu görebilir.
+════════════════════════════════════════════════════ */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  const k = e.key;
+  if (k === 'F12') { e.preventDefault(); return; }
+  if (e.ctrlKey && e.shiftKey && ['I','J','C','i','j','c'].includes(k)) { e.preventDefault(); return; }
+  if (e.ctrlKey && (k === 'u' || k === 'U')) { e.preventDefault(); return; }
+});
+
+/* ════════════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════════════ */
+const SUITS={S:{sym:'♠',col:'#1a1a1a',val:4},H:{sym:'♥',col:'#c0392b',val:3},D:{sym:'♦',col:'#c0392b',val:2},C:{sym:'♣',col:'#1a1a1a',val:1}};
+const SK=['S','H','D','C'];
+const RANKS=['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+const HV={A:4,K:3,Q:2,J:1};
+const SEAT=['N','E','S','W']; // dealer = North, clockwise
+const SUIT_ORDER={C:1,D:2,H:3,S:4,NT:5};
+
+/* ════════════════════════════════════════════════════
+   GAME SESSION STATE (persists across deals)
+════════════════════════════════════════════════════ */
+let dealerIdx=0;          // 0=N,1=E,2=S,3=W rotates each deal
+let vulNS=false,vulEW=false;  // vulnerability
+let scoreNS=0,scoreEW=0;  // cumulative rubber/match score
+let dealNumber=0;         // deal counter
+
+// Vulnerability rotation (standard bridge):
+// Deal 1: none vul, Deal 2: NS vul, Deal 3: EW vul, Deal 4: both vul
+// Then repeats
+const VUL_TABLE=[
+  {ns:false,ew:false}, // 1
+  {ns:true, ew:false}, // 2
+  {ns:false,ew:true},  // 3
+  {ns:true, ew:true},  // 4
+  {ns:true, ew:false}, // 5
+  {ns:false,ew:true},  // 6 — standard WBF cycle (simplified)
+  {ns:true, ew:true},  // 7
+  {ns:false,ew:false}, // 8
+];
+
+/* ════════════════════════════════════════════════════
+   BIDDING STATE
+════════════════════════════════════════════════════ */
+let hands={},history=[],lastBidVal=0,lastBidStr='',lastBidSeat=null;
+let doubled=false,redoubled=false,passCount=0,gameOver=false;
+let selLvl=null,selSuit=null;
+
+/* ════════════════════════════════════════════════════
+   PLAY STATE
+════════════════════════════════════════════════════ */
+let playActive=false,trump=null,declarer=null,dummy=null,contractLevel=0;
+let defL=null,defR=null,currentTrickSeat=null;
+let currentTrick=[],tricksDeclarer=0,tricksDefenders=0,trickCount=0;
+let playHands={},ledSuit=null;
+
+/* ════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════ */
+const el=id=>document.getElementById(id);
+const dr=r=>r==='T'?'10':r;
+
+function bval(l,s){return l*10+SUIT_ORDER[s];}
+function bstr(l,s){return s==='NT'?l+'NT':l+SUITS[s].sym;}
+function safeBid(l,s){
+  if(l<1||l>7) return null;
+  if(!SUIT_ORDER[s]) return null;
+  return bval(l,s)>lastBidVal?{bid:bstr(l,s)}:null;
+}
+
+// Kontur geçerlilik kontrolü — merkezi fonksiyon
+// seat: kontur yapan, opp1/opp2: rakipler
+function canDouble(seat){
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  const isNS=seat==='N'||seat==='S';
+  const opp1=isNS?'E':'N', opp2=isNS?'W':'S';
+  // Son gerçek bid (pas/X/XX hariç)
+  const lastReal=[...history].reverse().find(h=>h.bid!=='PASS'&&h.bid!=='X'&&h.bid!=='XX');
+  if(!lastReal) return false;
+  // Son gerçek bid RAKIPTEN gelmeli (partner veya kendimizden değil)
+  if(lastReal.seat===seat||lastReal.seat===partner) return false;
+  // Son gerçek bidden bu yana zaten X veya XX var mı?
+  const idx=history.indexOf(lastReal);
+  const since=history.slice(idx+1);
+  if(since.some(h=>h.bid==='X'||h.bid==='XX')) return false;
+  return true;
+}
+
+// Surkontr geçerlilik kontrolü
+function canRedouble(seat){
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  const isNS=seat==='N'||seat==='S';
+  const opp1=isNS?'E':'N', opp2=isNS?'W':'S';
+  // Son X bize veya partnerimize atılmış olmalı
+  const lastX=[...history].reverse().find(h=>h.bid==='X');
+  if(!lastX) return false;
+  // X\u2019i yapan rakip olmalı
+  if(lastX.seat!==opp1&&lastX.seat!==opp2) return false;
+  // X\u2019ten bu yana XX var mı?
+  const idx=history.indexOf(lastX);
+  const since=history.slice(idx+1);
+  if(since.some(h=>h.bid==='XX')) return false;
+  return true;
+}
+
+function makeDeck(){let d=[];SK.forEach(s=>RANKS.forEach(r=>d.push({r,s})));return d.sort(()=>Math.random()-.5);}
+function sortHand(h){h.sort((a,b)=>SUITS[b.s].val!==SUITS[a.s].val?SUITS[b.s].val-SUITS[a.s].val:RANKS.indexOf(a.r)-RANKS.indexOf(b.r));}
+function stats(h){
+  let hcp=0,cnt={S:0,H:0,D:0,C:0};
+  h.forEach(c=>{hcp+=(HV[c.r]||0);cnt[c.s]++;});
+  let dist=0;Object.values(cnt).forEach(n=>{if(n===0)dist+=3;else if(n===1)dist+=2;else if(n===2)dist+=1;});
+  return{hcp,dist,total:hcp+dist,cnt};
+}
+function isBalanced(cnt){let v=0,s=0;Object.values(cnt).forEach(n=>{if(n===0)v++;if(n===1)s++;});return v===0&&s<=1;}
+function bidSuitKey(bid){const r=bid.slice(1);if(r==='NT')return'NT';return SK.find(s=>SUITS[s].sym===r)||'C';}
+
+/* ════════════════════════════════════════════════════
+   INIT GAME
+════════════════════════════════════════════════════ */
+function startGame(resetAll=false){
+  if(resetAll){ dealerIdx=0; scoreNS=0; scoreEW=0; dealNumber=0; }
+  forceRevealAll=false; // yeni elde inceleme modu sıfırlanır
+
+  // Her 16 elde bir puanlama otomatik sıfırlanır (yeni oturum)
+  if(dealNumber>=16){
+    scoreNS=0; scoreEW=0; dealNumber=0; dealerIdx=0;
+    setTimeout(()=>alert('16 el tamamlandı — puan tablosu sıfırlandı, yeni oturum başlıyor.'), 50);
+  }
+
+  // Set vulnerability from table
+  const vul = VUL_TABLE[dealNumber % VUL_TABLE.length];
+  vulNS=vul.ns; vulEW=vul.ew;
+  dealNumber++;
+
+  // Current dealer
+  const dealer = SEAT[dealerIdx % 4];
+
+  history=[];lastBidVal=0;lastBidStr='';lastBidSeat=null;
+  doubled=false;redoubled=false;passCount=0;gameOver=false;
+  selLvl=null;selSuit=null;playActive=false;
+
+  el('logBody').innerHTML='';
+  el('anl').style.display='none';
+  el('btnNew').style.display='none';
+  el('ctrl').style.display='block';
+  el('thinking').style.display='none';
+  el('vCont').textContent='—';
+  el('bidWrap').style.display='grid';
+  el('playWrap').classList.remove('active');
+  el('scoreBar').classList.remove('active');
+  document.getElementById('contractInfo').classList.remove('active');
+  const bep=el('bidExplain');if(bep){bep.innerHTML='';bep.style.display='none';}
+  const fb=document.getElementById('finishBar');if(fb)fb.remove();
+  const pb2=document.getElementById('playBanner');if(pb2)pb2.style.display='none';
+
+  const d=makeDeck();
+  hands={N:d.slice(0,13),E:d.slice(13,26),S:d.slice(26,39),W:d.slice(39,52)};
+  Object.keys(hands).forEach(p=>sortHand(hands[p]));
+
+  // Show North stats (user=North)
+  const st=stats(hands.N);
+  el('vHcp').textContent=st.hcp;el('vDist').textContent=st.dist;el('vTotal').textContent=st.total;
+  el('sHcp').textContent=st.hcp;el('sDist').textContent=st.dist;el('sTotal').textContent=st.total;
+
+  buildCtrls();renderAll(false);refreshCtrls();
+  updateInfoBar();
+
+  // Rotate SEAT so dealer sits first
+  // The global SEAT stays ['N','E','S','W'] but we rebuild deal order
+  // currentSeat() uses history.length%4 from SEAT starting at dealer
+  // We store dealerIdx and offset in currentSeat
+  setTimeout(()=>{
+    const first=currentSeat();
+    if(first!=='N'){
+      triggerAI(); // dealer is E/S/W — AI bids first until N\u2019s turn
+    }
+    // If dealer is N, user bids first — controls are ready
+  }, 400);
+}
+
+/* ── INFO BAR UPDATE ── */
+function updateInfoBar(){
+  const dealer=SEAT[dealerIdx%4];
+  const dname={N:'Kuzey',E:'Doğu',S:'Güney',W:'Batı'}[dealer];
+  el('ibDeal').textContent='El: '+dealNumber+'/16';
+  el('ibDealer').textContent='Dağıtıcı: '+dname+(dealer==='N'?' (Siz)':'');
+  
+  let vulText='Zone: ';
+  let vulClass='none';
+  if(vulNS&&vulEW){vulText+='İkisi de';vulClass='both';}
+  else if(vulNS){vulText+='NS Zoneli';vulClass='ns';}
+  else if(vulEW){vulText+='EW Zoneli';vulClass='ew';}
+  else{vulText+='Yok';}
+  const vb=el('ibVul');
+  vb.textContent=vulText;
+  vb.className='ib-vul '+vulClass;
+  
+  el('ibNS').textContent='NS: '+(scoreNS>=0?'+':'')+scoreNS;
+  el('ibEW').textContent='EW: '+(scoreEW>=0?'+':'')+scoreEW;
+}
+
+/* ════════════════════════════════════════════════════
+   BIDDING CONTROLS
+════════════════════════════════════════════════════ */
+function buildCtrls(){
+  const lr=el('lvlRow');lr.innerHTML='';
+  for(let i=1;i<=7;i++){const b=document.createElement('button');b.className='bl';b.id='bl'+i;b.textContent=i;b.onclick=()=>pickLvl(i);lr.appendChild(b);}
+  const sr=el('suitRow');sr.innerHTML='';
+  ['C','D','H','S','NT'].forEach(s=>{const b=document.createElement('button');b.className='bs'+(s==='H'||s==='D'?' red':'');b.id='bs'+s;b.innerHTML=s==='NT'?'NT':SUITS[s].sym;b.onclick=()=>pickSuit(s);sr.appendChild(b);});
+}
+function pickLvl(l){selLvl=l;selSuit=null;document.querySelectorAll('.bl').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.bs').forEach(b=>b.classList.remove('on'));el('bl'+l).classList.add('on');refreshCtrls();}
+function pickSuit(s){selSuit=s;document.querySelectorAll('.bs').forEach(b=>b.classList.remove('on'));el('bs'+s).classList.add('on');refreshCtrls();}
+
+function refreshCtrls(){
+  for(let i=1;i<=7;i++){const b=el('bl'+i);if(!b)continue;b.disabled=(i*10+5<=lastBidVal);b.classList.toggle('on',selLvl===i);}
+  ['C','D','H','S','NT'].forEach(s=>{const b=el('bs'+s);if(!b)return;b.disabled=selLvl?bval(selLvl,s)<=lastBidVal:false;b.classList.toggle('on',selSuit===s);});
+  el('btnBid').disabled=!(selLvl&&selSuit&&bval(selLvl,selSuit)>lastBidVal);
+
+  // Kontur/Surkontr — merkezi validasyon kullan
+  el('btnDbl').disabled=!(!gameOver&&canDouble('N'));
+  el('btnRdbl').disabled=!(!gameOver&&canRedouble('N'));
+}
+
+/* ════════════════════════════════════════════════════
+   TURN MANAGEMENT
+════════════════════════════════════════════════════ */
+function currentSeat(){
+  // Dealer rotates: history[0] = dealer\u2019s first bid
+  return SEAT[(dealerIdx + history.length) % 4];
+}
+
+function record(bid,seat,isX,isXX){
+  if(bid==='PASS')passCount++;
+  else if(isX){doubled=true;redoubled=false;passCount=0;}
+  else if(isXX){redoubled=true;doubled=false;passCount=0;}
+  else{passCount=0;lastBidVal=bval(parseInt(bid[0]),bidSuitKey(bid));lastBidStr=bid;lastBidSeat=seat;doubled=false;redoubled=false;}
+  history.push({seat,bid,isX,isXX});
+  renderLog();updateContractBar();
+  // Deklerasyon açıklama paneli kaldırıldı
+  const realBids=history.filter(h=>h.bid!=='PASS'&&h.bid!=='X'&&h.bid!=='XX');
+  // Finish conditions:
+  // 1. At least one real bid + 3 consecutive passes
+  // 2. All 4 players passed (no bid)
+  // 3. Safety: max 48 bids (prevents infinite loop)
+  if((realBids.length>0&&passCount>=3)||
+     (realBids.length===0&&history.length===4&&passCount===4)||
+     history.length>=48){
+    finish();return true;
+  }
+  selLvl=null;selSuit=null;refreshCtrls();return false;
+}
+
+/* ════════════════════════════════════════════════════
+   USER BIDS
+════════════════════════════════════════════════════ */
+function doBid(){
+  if(!selLvl||!selSuit) return;
+  const seat=currentSeat();
+  if(seat!=='N') return; // user is North
+  if(record(bstr(selLvl,selSuit),'N',false,false)) return;
+  triggerAI();
+}
+function doPass(){
+  const seat=currentSeat();
+  if(seat!=='N') return;
+  const force=currentForceStatus('N');
+  if(force){
+    const ok=confirm('Partnerinizin bidi FORCING! Normalde pas geçilemez.\n\nYine de pas geçmek istiyor musunuz?');
+    if(!ok) return;
+  }
+  if(record('PASS','N',false,false)) return;
+  triggerAI();
+}
+function doDouble(){
+  if(currentSeat()!=='N') return;
+  if(!canDouble('N')){alert('Şu an kontr atamazsınız!');return;}
+  if(record('X','N',true,false)) return;
+  triggerAI();
+}
+function doRedouble(){
+  if(currentSeat()!=='N') return;
+  if(!canRedouble('N')){alert('Şu an surkontr atamazsınız!');return;}
+  if(record('XX','N',false,true)) return;
+  triggerAI();
+}
+
+function triggerAI(){if(gameOver)return;el('thinking').style.display='block';stepAI();}
+function stepAI(){
+  if(gameOver){el('thinking').style.display='none';return;}
+  const seat=currentSeat();
+  if(seat==='N'){el('thinking').style.display='none';refreshCtrls();return;}
+  setTimeout(()=>{
+    if(gameOver)return;
+    try{
+      const m=getAIBid(seat)||{bid:'PASS'};
+      if(record(m.bid,seat,m.isX||false,m.isXX||false))return;
+      stepAI();
+    }catch(e){
+      console.error('stepAI error:',e.message);
+      // Hata durumunda pas geç
+      try{if(record('PASS',seat,false,false))return;stepAI();}catch(e2){}
+    }
+  },430);
+}
+
+/* ════════════════════════════════════════════════════
+   AI BIDDING ENGINE — STANDARD AMERICAN 5-CARD MAJOR
+════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   AI BIDDING ENGINE — STANDARD AMERICAN 5-CARD MAJOR
+   Full multi-round auction logic
+══════════════════════════════════════════════════════════════ */
+
+// Helper: extract suit key ('S','H','D','C','NT') from a bid string
+function suitOf(bid){
+  if(!bid||bid==='PASS'||bid==='X'||bid==='XX') return null;
+  const r=bid.slice(1);
+  if(r==='NT') return 'NT';
+  return SK.find(s=>SUITS[s].sym===r)||null;
+}
+// Helper: level of a bid string
+function lvlOf(bid){return parseInt(bid)||0;}
+
+
+/* ══════════════════════════════════════════════════════════════
+   FORCING BID SİSTEMİ
+   Partner'ın forcing (devam zorunlu) bidinden sonra pas geçilemez.
+   Kapsanan durumlar: Jump shift (opener rebid), 2/1 yeni renk,
+   Cue bid, 4. renk forcing, Negative/Takeout double.
+══════════════════════════════════════════════════════════════ */
+
+function partnerOf(seat){return seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';}
+function isNSseat(seat){return seat==='N'||seat==='S';}
+
+// seat, verilen rengi auction boyunca kaç KEZ bidledi? (açılış dahil)
+function suitBidCount(seat, suit){
+  return history.filter(h=>h.seat===seat&&h.bid!=='PASS'&&!h.isX&&!h.isXX&&suitOf(h.bid)===suit).length;
+}
+
+// GÜVENLİ RENK TIRMANDIRMA: partner hiç fit göstermediyse aynı rengi
+// sonsuza kadar yükseltmeyi ENGELLER. En fazla 2 kez tekrar edilebilir,
+// ve sadece gerçek HCP artışı varsa (mekanik "6 kart var" yetmez).
+function safeSuitRebid(seat, st, suit, myLvl, combined){
+  if(!suit||suit==='NT') return null;
+  const already=suitBidCount(seat,suit);
+  if(already>=3) return null; // 3. kez söylendiyse dur — partner istemiyor demektir
+  // Combined güç gerçekten oyun/slam bölgesine işaret etmiyorsa daha fazla yükselme
+  if(combined && combined.min<20 && myLvl>=3) return null;
+  const nextLvl=myLvl+1;
+  if(nextLvl>7) return null;
+  return safeBid(nextLvl,suit);
+}
+
+// seat'in şu an forcing bir duruma karşı bid vermesi mi gerekiyor?
+// Döner: null (forcing yok) | 'round' (bu tur pas yasak) | 'game' (oyuna kadar pas yasak)
+function currentForceStatus(seat){
+  const partner=partnerOf(seat);
+  const pBids=history.filter(x=>x.seat===partner&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  if(!pBids.length) return null;
+  const pLast=pBids[pBids.length-1];
+  const pLastIdx=history.indexOf(pLast);
+
+  // seat bu partner bidinden SONRA zaten gerçek bir bid yaptı mı? (forcing tek tur ise tatmin olmuş)
+  const respondedSince=history.slice(pLastIdx+1).some(h=>h.seat===seat&&h.bid!=='PASS'&&!h.isX&&!h.isXX);
+
+  const pBid=pLast.bid, pSuit=suitOf(pBid), pLvl=lvlOf(pBid);
+  const priorH=history.slice(0,pLastIdx);
+  const partnerPriorBids=priorH.filter(x=>x.seat===partner&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const seatPriorBids=priorH.filter(x=>x.seat===seat&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+
+  // ── Negative/Takeout Double (X) — round forcing ───────────
+  // Partner'ın en son AKSİYONU (real bid değil) X ise ve henüz cevaplanmadıysa
+  const lastPartnerAction=[...history].reverse().find(h=>h.seat===partner);
+  if(lastPartnerAction && lastPartnerAction.isX && !respondedSince){
+    const idx2=history.indexOf(lastPartnerAction);
+    const alreadyPassed=history.slice(idx2+1).some(h=>h.seat===seat&&h.bid==='PASS');
+    if(!alreadyPassed) return 'round';
+  }
+
+  if(respondedSince) return null; // real bid ile zaten cevaplanmış
+
+  // ── Cue bid: partner rakibin rengini bidledi → game force ──
+  const oppSeats=isNSseat(seat)?['E','W']:['N','S'];
+  if(pSuit&&pSuit!=='NT'){
+    const oppBidThisSuit=priorH.some(h=>oppSeats.includes(h.seat)&&h.bid!=='PASS'&&!h.isX&&!h.isXX&&suitOf(h.bid)===pSuit);
+    if(oppBidThisSuit) return 'game';
+  }
+
+  // ── Jump shift (opener rebid): partner'ın 2. bidi, yeni renk, seviye atlamalı ──
+  if(partnerPriorBids.length===1 && seatPriorBids.length>=1){
+    const respBid=seatPriorBids[seatPriorBids.length-1];
+    const respSuit=suitOf(respBid.bid), respLvl=lvlOf(respBid.bid);
+    if(pSuit&&pSuit!=='NT'&&pSuit!==suitOf(partnerPriorBids[0].bid)&&pSuit!==respSuit){
+      let cheapestLvl=respLvl;
+      while(bval(cheapestLvl,pSuit)<=bval(respLvl,respSuit)) cheapestLvl++;
+      if(pLvl>cheapestLvl) return 'game'; // jump shift
+    }
+  }
+
+  // ── 2/1 yeni renk cevabı: forcing bir tur ─────────────────
+  if(partnerPriorBids.length===0&&seatPriorBids.length===0){
+    const myOpen=history.slice(0,pLastIdx).find(h=>h.seat===seat&&h.bid!=='PASS'&&!h.isX&&!h.isXX);
+    if(myOpen){
+      const myOpenLvl=lvlOf(myOpen.bid), myOpenSuit=suitOf(myOpen.bid);
+      if(pLvl===2&&pSuit&&pSuit!=='NT'&&pSuit!==myOpenSuit&&myOpenLvl===1){
+        return 'round';
+      }
+    }
+  }
+
+  // ── 4. Renk Forcing: 3 renk bidlenmiş, 4.sü yeni ──────────
+  const suitsBid=new Set(priorH.filter(h=>h.bid!=='PASS'&&!h.isX&&!h.isXX).map(h=>suitOf(h.bid)).filter(s=>s&&s!=='NT'));
+  if(pSuit&&pSuit!=='NT'&&!suitsBid.has(pSuit)&&suitsBid.size===3){
+    return 'game';
+  }
+
+  return null;
+}
+
+// Forcing durumda ASLA pas geçilemez — ama sonsuz tırmanma da YASAK.
+// Aynı rengi en fazla 2 kez tekrar eder, sonra NT'ye veya pasa döner.
+function forcedContinuation(seat, st, agreedGuess, combined){
+  const{cnt,hcp}=st;
+  const sb=(l,s)=>safeBid(l,s);
+  // 1. Fit varsa (3+ kart) agreed rengi — ama en fazla 2 kez tekrarla
+  if(agreedGuess&&agreedGuess!=='NT'&&cnt[agreedGuess]>=3&&suitBidCount(seat,agreedGuess)<3){
+    for(let l=1;l<=7;l++){const b=sb(l,agreedGuess);if(b)return b;}
+  }
+  // 2. En uzun rengimi (4+) rebid et — ama sadece 2 tekrara kadar
+  const bySuitLen=SK.map(s=>({s,n:cnt[s]||0})).sort((a,b)=>b.n-a.n);
+  for(const{s,n} of bySuitLen){
+    if(n>=4 && suitBidCount(seat,s)<3){
+      for(let l=1;l<=7;l++){const b=sb(l,s);if(b)return b;}
+    }
+  }
+  // 3. NT en ucuz seviyede (henüz denenmediyse)
+  if(suitBidCount(seat,'NT')<2){
+    for(let l=1;l<=7;l++){const b=sb(l,'NT');if(b)return b;}
+  }
+  // 4. Artık hiçbir renk mantıklı değil — forcing teorik olarak bitmiş sayılır, PAS
+  return{bid:'PASS'};
+}
+
+function getAIBid(seat){
+  const h=hands[seat], st=stats(h);
+  const {hcp,cnt}=st;
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  const isNS=seat==='N'||seat==='S';
+  const opp1=isNS?'E':'N', opp2=isNS?'W':'S';
+
+  // Full bid histories
+  const myBids  = history.filter(x=>x.seat===seat    &&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const pBids   = history.filter(x=>x.seat===partner  &&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const oppBids = history.filter(x=>(x.seat===opp1||x.seat===opp2)&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const myLast  = myBids[myBids.length-1];
+  const pLast   = pBids[pBids.length-1];
+  const lastReal= [...history].reverse().find(x=>x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const oppActive= lastReal&&(lastReal.seat===opp1||lastReal.seat===opp2);
+
+  // Partner\u2019s suit and level from their latest bid
+  const pSuit = pLast ? suitOf(pLast.bid) : null;
+  const pLvl  = pLast ? lvlOf(pLast.bid)  : 0;
+  // My suit and level
+  const mySuit= myLast ? suitOf(myLast.bid) : null;
+  const myLvl = myLast ? lvlOf(myLast.bid)  : 0;
+
+  // Agreed suit: a suit that both partners have bid (showing fit)
+  // Look through ALL bids to find a suit bid by both partners
+  function agreedSuit(){
+    const mySuits = myBids.map(b=>suitOf(b.bid)).filter(Boolean);
+    const pSuits  = pBids.map(b=>suitOf(b.bid)).filter(Boolean);
+    // Find a suit bid by both (fit = both showed same suit)
+    for(const s of mySuits) if(pSuits.includes(s) && s!=='NT') return s;
+    // Or: partner raised me (partner bid same suit as my first bid)
+    if(myBids.length>=1 && pBids.length>=1){
+      const myFirst = suitOf(myBids[0].bid);
+      if(myFirst && pSuits.includes(myFirst)) return myFirst;
+      const pFirst  = suitOf(pBids[0].bid);
+      if(pFirst && mySuits.includes(pFirst)) return pFirst;
+    }
+    return null;
+  }
+  const agreed = agreedSuit();
+
+  const sb=(l,s)=>safeBid(l,s);
+  let cand=null;
+
+  // ── HARD STOP: above 7NT nothing can be bid ──────────────
+  if(lastBidVal>=75) return{bid:'PASS'};
+
+  // ── 0. BLACKWOOD PRIORITY — must respond or act on 4NT ────
+  // Answer Blackwood (4NT) — highest priority
+  if(mustAnswerBlackwood(seat)){
+    return blackwoodResponse(seat);
+  }
+  // Answer 5NT king ask
+  if(mustAnswerFiveNT(seat)){
+    return fiveNTResponse(seat);
+  }
+  // After partner answered our Blackwood, decide final contract
+  const bw=lastBlackwood();
+  if(bw && bw.seat===seat && blackwoodAnswered()){
+    const bwCont=afterBlackwood(seat, agreed);
+    if(bwCont) return bwCont;
+  }
+
+  // ── 1. OPENING (no prior real bid) ────────────────────────
+  if(!lastReal){
+    cand = aiOpen(st);
+
+  // ── 2. FIRST RESPONSE ─────────────────────────────────────
+  } else if(!myLast){
+    // Ben henüz hiç bid vermedim
+    const opp=lastOppBid(seat);
+    const ptd=partnerMadeTakeout(seat);
+    if(ptd && opp){
+      // Partner takeout double yaptı → cevap ver
+      cand = aiResponseToTakeout(seat, st, opp);
+    } else if(pLast && opp){
+      // Partner açtı + rakip overcall yaptı → rekabetçi cevap
+      cand = aiResponseAfterOvercall(seat, st, pLast, opp);
+    } else if(pLast){
+      // Normal ilk cevap
+      cand = aiFirstResponse(st, pLast, false);
+    } else if(oppActive){
+      // Sadece rakip konuştu → overcall veya takeout
+      cand = aiOvercall(st, lastReal);
+    }
+
+  // ── 5. OPENER REBID ────────────────────────────────────────
+  } else if(myLast && pLast && myBids.length===1 && pBids.length===1){
+    // Partner negative double yaptı mı?
+    const partnerX=history.find(x=>x.seat===partner&&x.isX);
+    const opp=lastOppBid(seat);
+    if(partnerX && opp){
+      cand = aiAfterNegDouble(seat, st, myLast, opp);
+    } else {
+      cand = aiOpenerRebid(seat, st, myLast, pLast);
+    }
+
+  // ── 6. RESPONDER REBID ─────────────────────────────────────
+  } else if(myLast && pLast && myBids.length===1 && pBids.length>=2){
+    cand = aiResponderRebid(seat, st, myLast, pLast);
+
+  // ── 7. LATER AUCTION ───────────────────────────────────────
+  } else if(myLast && pLast){
+    // Law of Total Tricks: rekabetçi devam
+    const opp=lastOppBid(seat);
+    if(opp && agreed){
+      const safeLevel=lawOfTotalTricks(seat, st, agreed);
+      const sb2=(l,s)=>safeBid(l,s);
+      if(safeLevel>=4&&(agreed==='S'||agreed==='H'))
+        cand=sb2(4,agreed)||null;
+      else if(safeLevel>=3)
+        cand=sb2(3,agreed)||null;
+    }
+    if(!cand) cand = aiLaterAuction(seat, st, myLast, pLast, agreed);
+  }
+
+  // ── 8. TAKEOUT DOUBLE (son şans) ────────────────────────────
+  if(!cand && oppActive && !myLast){
+    if(canDouble(seat) && hcp>=12 && lastBidVal<=40)
+      cand={bid:'X',isX:true};
+  }
+
+  // ── 9. FORCING KONTROLÜ — partner forcing bid yaptıysa PAS yasak ──
+  if((!cand || cand.bid==='PASS')){
+    const force=currentForceStatus(seat);
+    if(force){
+      const fc=forcedContinuation(seat, st, agreed);
+      if(fc && fc.bid!=='PASS') cand=fc;
+    }
+  }
+
+  // ── SAFETY: validate bid ─────────────────────────────────
+  if(cand && cand.bid!=='PASS' && !cand.isX && !cand.isXX){
+    const l=parseInt(cand.bid[0]); const sk=bidSuitKey(cand.bid);
+    if(isNaN(l)||l<1||l>7||bval(l,sk)<=lastBidVal) cand={bid:'PASS'};
+  }
+  // X/XX güvenlik: canDouble/canRedouble ile doğrula
+  if(cand && cand.isX && !canDouble(seat)) cand={bid:'PASS'};
+  if(cand && cand.isXX && !canRedouble(seat)) cand={bid:'PASS'};
+
+  // ── SON DEVRE KESİCİ: aynı renk 4+ kez tekrar edilemez ────
+  // Hangi fonksiyondan gelirse gelsin, sonsuz tırmanmayı garanti önler.
+  if(cand && cand.bid!=='PASS' && !cand.isX && !cand.isXX){
+    const csk=bidSuitKey(cand.bid);
+    if(suitBidCount(seat,csk)>=4) cand={bid:'PASS'};
+  }
+
+  return cand||{bid:'PASS'};
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   KOMPETİTİF DEKLERE SİSTEMİ
+   1. Overcall\u2019dan sonra partner cevabı
+   2. Negative Double
+   3. Takeout Double\u2019a cevap
+   4. Cue bid (force to game)
+   5. Law of Total Tricks
+   6. Jump overcall
+══════════════════════════════════════════════════════════════ */
+
+// Son gerçek rakip bidini bul (partner değil, rakip)
+function lastOppBid(seat){
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  const isNS=seat==='N'||seat==='S';
+  const opp1=isNS?'E':'N', opp2=isNS?'W':'S';
+  return [...history].reverse().find(x=>
+    (x.seat===opp1||x.seat===opp2)&&x.bid!=='PASS'&&!x.isX&&!x.isXX
+  )||null;
+}
+
+// Partner\u2019ın ilk bidi neydi?
+function partnerFirstBid(seat){
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  return history.find(x=>x.seat===partner&&x.bid!=='PASS'&&!x.isX&&!x.isXX)||null;
+}
+
+// Partner takeout double yaptı mı?
+function partnerMadeTakeout(seat){
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  // Partner X yaptı ve öncesinde rakip bid vardı
+  const px=history.find(x=>x.seat===partner&&x.isX);
+  if(!px) return null;
+  // X\u2019ten önce rakip bid var mıydı?
+  const pxIdx=history.indexOf(px);
+  const beforeX=history.slice(0,pxIdx).reverse().find(x=>
+    x.bid!=='PASS'&&!x.isX&&!x.isXX&&x.seat!==partner
+  );
+  return beforeX?px:null; // takeout double
+}
+
+// ── 1. OVERCALL'DAN SONRA PARTNER CEVABI ──────────────────────
+// Durum: partner 1x açtı, rakip overcall yaptı, biz cevap veriyoruz
+function aiResponseAfterOvercall(seat, st, pOpen, oppOvercall){
+  if(!pOpen||!oppOvercall) return {bid:'PASS'};
+  const{hcp,cnt}=st;
+  const tot=aggrTotal(st);
+  const sb=(l,s)=>safeBid(l,s);
+  const pSuit=suitOf(pOpen.bid)||'C';
+  const pLvl=lvlOf(pOpen.bid)||1;
+  const oppSuit=suitOf(oppOvercall.bid)||'S';
+  const oppLvl=lvlOf(oppOvercall.bid)||1;
+
+  // ── NEGATIVE DOUBLE ──────────────────────────────────────
+  if(hcp>=8 && (oppLvl===1 || (oppLvl===2&&oppSuit==='S'))){
+    let negDbl=false;
+    if(oppSuit==='S' && cnt.H>=4) negDbl=true;
+    else if(oppSuit==='H' && cnt.S>=4) negDbl=true;
+    else if((oppSuit==='D'||oppSuit==='C') && (cnt.S>=4||cnt.H>=4)) negDbl=true;
+    if(negDbl && canDouble(seat)) return {bid:'X', isX:true};
+  }
+
+  // ── CUE BID = güçlü fit (partner rengini destekliyoruz) ──
+  // Rakibin rengine cue bid = game force, partner rengi fitimiz var
+  if(pSuit && oppSuit && cnt[pSuit]>=3 && hcp>=13){
+    return sb(oppLvl+1, oppSuit)||{bid:'PASS'}; // cue bid
+  }
+  // Limit raise (overcall sonrası basit raise = zayıf, jump raise = invite)
+  if(pSuit&&(pSuit==='S'||pSuit==='H')){
+    if(cnt[pSuit]>=3&&hcp>=13) return sb(4,pSuit)||{bid:'PASS'}; // game
+    if(cnt[pSuit]>=4&&hcp>=10) return sb(3,pSuit)||{bid:'PASS'}; // limit raise
+    if(cnt[pSuit]>=3&&hcp>=6)  return sb(2,pSuit)||{bid:'PASS'}; // simple raise
+  }
+  if(pSuit&&(pSuit==='D'||pSuit==='C')){
+    if(cnt[pSuit]>=4&&hcp>=13) return sb(3,'NT')||{bid:'PASS'};
+    if(cnt[pSuit]>=4&&hcp>=10) return sb(3,pSuit)||{bid:'PASS'};
+    if(cnt[pSuit]>=4&&hcp>=7)  return sb(2,pSuit)||{bid:'PASS'};
+  }
+  // Yeni renk = forcing (overcall sonrası yeni renk gösterilebilir)
+  if(hcp>=10){
+    // 1 seviyesinde yeni majör
+    if(cnt.S>=5 && bval(1,'S')>lastBidVal&&suitOf(pOpen.bid)!=='S')
+      return sb(1,'S')||{bid:'PASS'};
+    if(cnt.H>=5 && bval(1,'H')>lastBidVal&&suitOf(pOpen.bid)!=='H')
+      return sb(1,'H')||{bid:'PASS'};
+  }
+  // NT cevapları (overcall sonrası NT = duruyorcu el)
+  if(hcp>=13&&isBalanced(cnt)) return sb(2,'NT')||{bid:'PASS'};
+  if(hcp>=10&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'};
+  if(hcp>=8&&isBalanced(cnt))  return sb(1,'NT')||{bid:'PASS'};
+
+  // Penalty double: çok güçlü el, rakip overcall düşebilir
+  if(hcp>=14 && canDouble(seat)) return {bid:'X', isX:true};
+
+  return {bid:'PASS'};
+}
+
+// ── 2. TAKEOUT DOUBLE'A CEVAP ─────────────────────────────────
+// Durum: rakip 1x açtı, partner X (takeout) yaptı, biz cevap veriyoruz
+function aiResponseToTakeout(seat, st, oppBid){
+  if(!oppBid) return {bid:'PASS'};
+  const{hcp,cnt}=st;
+  const sb=(l,s)=>safeBid(l,s);
+  const oppSuit=suitOf(oppBid.bid)||'S';
+  const oppLvl=lvlOf(oppBid.bid)||1;
+
+  // Takeout double\u2019a MUTLAKA cevap verilmeli (pass yasak, rakip alttaysa)
+  // En uzun rengi veya en güçlü rengi söyle
+
+  // Cue bid = game force (12+ HCP) — rakibin rengi üstüne
+  if(hcp>=12 && oppSuit){
+    const cb=sb(oppLvl+1, oppSuit);
+    if(cb) return cb;
+    // Cue bid mümkün değilse NT
+    return sb(2,'NT')||sb(3,'NT')||{bid:'PASS'};
+  }
+
+  // Jump cevap = invite (9-11 HCP)
+  if(hcp>=9){
+    if(cnt.S>=4&&oppSuit!=='S') return sb(2,'S')||{bid:'PASS'}; // jump
+    if(cnt.H>=4&&oppSuit!=='H') return sb(2,'H')||{bid:'PASS'};
+    if(cnt.D>=4&&oppSuit!=='D') return sb(2,'D')||{bid:'PASS'};
+    if(cnt.C>=4&&oppSuit!=='C') return sb(2,'C')||{bid:'PASS'};
+    return sb(1,'NT')||{bid:'PASS'};
+  }
+
+  // Minimum cevap (0-8 HCP) — en iyi renge en düşük seviyede
+  // Tercih: majör > minör
+  const choices=[];
+  if(cnt.S>=4&&oppSuit!=='S') choices.push(['S',cnt.S]);
+  if(cnt.H>=4&&oppSuit!=='H') choices.push(['H',cnt.H]);
+  if(cnt.D>=3&&oppSuit!=='D') choices.push(['D',cnt.D]);
+  if(cnt.C>=3&&oppSuit!=='C') choices.push(['C',cnt.C]);
+  choices.sort((a,b)=>b[1]-a[1]); // uzun olana göre sırala
+
+  for(const [suit] of choices){
+    const b=sb(1,suit)||sb(2,suit);
+    if(b) return b;
+  }
+  // Hiçbir renk yoksa NT
+  return sb(1,'NT')||{bid:'PASS'};
+}
+
+// ── 3. NEGATIVE DOUBLE SONRASI OPENER REBID ───────────────────
+// Partner negative double yaptı → opener en iyi rengi söyler
+function aiAfterNegDouble(seat, st, myOpen, oppOvercall){
+  if(!myOpen||!oppOvercall) return {bid:'PASS'};
+  const{hcp,cnt}=st;
+  const sb=(l,s)=>safeBid(l,s);
+  const oppSuit=suitOf(oppOvercall.bid)||'S';
+  const mySuit=suitOf(myOpen.bid)||'C';
+
+  // Partner negatif double = diğer majör(ler) var
+  // Eğer partner ♥ gösterdi (opp overcall ♠) → ♥ destekle
+  if(oppSuit==='S' && cnt.H>=4){
+    if(hcp>=17) return sb(3,'H')||{bid:'PASS'}; // güçlü destek
+    return sb(2,'H')||{bid:'PASS'}; // normal destek
+  }
+  if(oppSuit==='H' && cnt.S>=4){
+    if(hcp>=17) return sb(3,'S')||{bid:'PASS'};
+    return sb(2,'S')||{bid:'PASS'};
+  }
+  // Minör overcall → partner her iki majörü gösterdi
+  if(oppSuit==='D'||oppSuit==='C'){
+    if(cnt.S>=4){
+      if(hcp>=17) return sb(2,'S')||{bid:'PASS'};
+      return sb(1,'S')||{bid:'PASS'};
+    }
+    if(cnt.H>=4){
+      if(hcp>=17) return sb(2,'H')||{bid:'PASS'};
+      return sb(1,'H')||{bid:'PASS'};
+    }
+  }
+  // Partner rengi yoksa kendi rengi
+  if(mySuit&&mySuit!=='NT'&&cnt[mySuit]>=5){
+    return sb(2,mySuit)||{bid:'PASS'};
+  }
+  if(hcp>=15) return sb(2,'NT')||{bid:'PASS'};
+  return sb(1,'NT')||{bid:'PASS'};
+}
+
+// ── 4. LAW OF TOTAL TRICKS (yarışmalı deklere kararı) ────────
+// Toplam koz sayısı = güvenli oynayabileceğimiz seviye
+function lawOfTotalTricks(seat, st, fitSuit){
+  const{cnt}=st;
+  if(!fitSuit||fitSuit==='NT') return 0;
+  // Kendi fitteki koz sayısı (partner\u2019ın koz sayısını tahmin et)
+  // Basit kural: kendi kartın + partner için varsayılan 3-4 kart
+  const myCnt=cnt[fitSuit]||0;
+  const estimatedFit=myCnt+3; // partner minimum 3 kart varsayımı
+  // Law: toplam koz = güvenli seviye
+  // 8 koz → 2 seviye, 9 → 3, 10 → 4, 11 → 5
+  if(estimatedFit>=11) return 5;
+  if(estimatedFit>=10) return 4;
+  if(estimatedFit>=9)  return 3;
+  if(estimatedFit>=8)  return 2;
+  return 1;
+}
+
+// ── 5. JUMP OVERCALL'A CEVAP ──────────────────────────────────
+// Rakip 2 seviyede atlayarak overcall yaptı (preemptive)
+function aiVsJumpOvercall(seat, st, oppBid){
+  const{hcp,cnt}=st;
+  const sb=(l,s)=>safeBid(l,s);
+  const oppLvl=lvlOf(oppBid.bid);
+
+  // Güçlü ellerle rekabet et
+  if(hcp>=13){
+    // Takeout double
+    if(!history.some(x=>x.seat===seat&&(x.isX||x.isXX)))
+      return {bid:'X',isX:true};
+  }
+  if(hcp>=17&&isBalanced(cnt)) return sb(2,'NT')||sb(3,'NT')||{bid:'PASS'};
+  // Partner rengine destek
+  return {bid:'PASS'};
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   COMBINED STRENGTH ESTIMATOR — ZONE BAĞLAMA SİSTEMİ
+   Partner\u2019ın bidinden minimum HCP tahmini yaparak
+   combined güce göre doğru seviyeye gidilir.
+   
+   Oyun bölgesi:  NS/EW toplam 25+ HCP veya fit ile 24+
+   Slam bölgesi:  33+ HCP (küçük slam), 37+ HCP (grand slam)
+══════════════════════════════════════════════════════════════ */
+
+// Partner\u2019ın bidinden minimum HCP tahmini
+function partnerMinHCP(bid){
+  if(!bid||!bid.bid||bid.bid==='PASS'||bid.isX||bid.isXX) return 0;
+  if(typeof bid.bid !== 'string') return 0;
+  const b=bid.bid;
+  const lvl=lvlOf(b);
+  const suit=suitOf(b);
+  // Açılış bideleri
+  if(lvl===1&&suit==='NT') return 15; // 1NT = 15-17
+  if(lvl===2&&suit==='NT') return 20; // 2NT = 20-21
+  if(lvl===2&&suit==='C')  return 22; // 2♣ = GÜÇLÜ 22+
+  if(lvl===1) return 12; // 1x açılış = 12+
+  if(lvl===2) return 6;  // 2♦/♥/♠ weak preempt = 6-10
+  if(lvl===3) return 5;  // 3x preempt
+  // Cevap bideleri
+  if(lvl===1&&suit!=='NT') return 6;   // 1/1 = 6+
+  if(lvl===2&&suit!=='NT') return 10;  // 2/1 = 10+
+  if(suit==='NT'&&lvl===1) return 6;   // 1NT cevap
+  if(suit==='NT'&&lvl===2) return 11;  // 2NT cevap
+  if(suit==='NT'&&lvl===3) return 13;  // 3NT cevap
+  return 8; // varsayılan minimum
+}
+
+// Partner\u2019ın bidinden maksimum HCP tahmini
+function partnerMaxHCP(bid){
+  if(!bid||bid.bid==='PASS'||bid.isX||bid.isXX) return 37;
+  const b=bid.bid;
+  const lvl=lvlOf(b);
+  const suit=suitOf(b);
+  if(lvl===1&&suit==='NT') return 17;
+  if(lvl===2&&suit==='NT') return 21;
+  if(lvl===2&&suit==='C')  return 37;
+  if(lvl===1) return 21;
+  if(lvl===2) return 10; // weak
+  if(lvl===3) return 10; // preempt
+  return 21;
+}
+
+// Tüm bid geçmişinden partner için kümülatif HCP tahmini
+function estimatePartnerHCP(seat){
+  const partner=partnerOf(seat);
+  const pBids=history.filter(x=>x.seat===partner&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  if(!pBids.length) return {min:0,max:37};
+  const first=pBids[0];
+  const firstLvl=lvlOf(first.bid), firstSuit=suitOf(first.bid);
+  const isPreempt=(firstLvl===2&&firstSuit!=='NT'&&firstSuit!=='C')||firstLvl===3||firstLvl===4;
+  let min=partnerMinHCP(first);
+  let max=partnerMaxHCP(first);
+
+  // Sonraki bidleri sırayla değerlendir: jump mı, sign-off mu?
+  for(let i=1;i<pBids.length;i++){
+    const b=pBids[i];
+    const idx=history.indexOf(b);
+    const lvl=lvlOf(b.bid), suit=suitOf(b.bid);
+    if(!suit) continue;
+    // Bu bidden önceki en yüksek bid neydi? (minimum legal devam neydi?)
+    const beforeVal=history.slice(0,idx).reverse().find(h=>h.bid!=='PASS'&&!h.isX&&!h.isXX);
+    let minimalLvl=lvl;
+    if(beforeVal){
+      const bv=bval(lvlOf(beforeVal.bid),suitOf(beforeVal.bid));
+      minimalLvl=lvlOf(beforeVal.bid);
+      while(bval(minimalLvl,suit)<=bv) minimalLvl++;
+    }
+    const isJump=lvl>minimalLvl;
+
+    if(isPreempt){
+      // Preempt sonrası raise HCP göstermez — sadece minimumu koru
+      continue;
+    }
+    if(isJump){
+      // Jump = ekstra güç. Ne kadar ekstra, seviye farkına göre artır.
+      const jumpSize=lvl-minimalLvl;
+      min=Math.max(min, 16+ (jumpSize>=2?3:0));
+      if(lvl>=4) min=Math.max(min,17);
+    } else {
+      // Minimum (jump olmayan) rebid — sign-off eğilimi, max'ı sıkılaştır
+      max=Math.min(max, min+6);
+      if(lvl>=3&&suit!=='NT') min=Math.max(min,12);
+      if(lvl>=2&&suit==='NT') min=Math.max(min,14);
+    }
+  }
+  if(min>max) max=min+4; // tutarlılık güvencesi
+  return {min,max};
+}
+
+// Combined HCP aralığı hesapla
+function combinedHCP(seat, myHCP){
+  try{
+    const p=estimatePartnerHCP(seat);
+    return {
+      min: myHCP+(p.min||0),
+      max: myHCP+(p.max||37),
+      likely: myHCP+Math.round(((p.min||0)+(p.max||21))/2)
+    };
+  }catch(e){
+    return {min:myHCP, max:myHCP+21, likely:myHCP+12};
+  }
+}
+
+// Zone hedefi: combined gücüne göre ne oynamalı?
+function targetContract(combined, fitSuit, fitLen){
+  if(!combined) return {level:2,suit:'NT',reason:'Varsayılan'};
+  const min=combined.min||0;
+  const likely=combined.likely||combined.min||0;
+  fitLen=fitLen||0;
+  const isMajor=fitSuit==='S'||fitSuit==='H';
+  const hasFit=fitLen>=8;
+  
+  // Grand Slam
+  if(min>=37) return {level:7,suit:hasFit?fitSuit:'NT',reason:'Grand Slam (37+ HCP)'};
+  if(likely>=36&&hasFit) return {level:7,suit:fitSuit,reason:'Grand Slam denemesi'};
+  
+  // Small Slam
+  if(min>=33) return {level:6,suit:hasFit?fitSuit:'NT',reason:'Küçük Slam (33+ HCP)'};
+  if(likely>=32&&hasFit) return {level:6,suit:fitSuit,reason:'Slam denemesi'};
+  
+  // Game
+  if(min>=25&&hasFit&&isMajor) return {level:4,suit:fitSuit,reason:'Majör oyun (25+ HCP)'};
+  if(min>=26&&!hasFit) return {level:3,suit:'NT',reason:'3NT oyun (26+ HCP)'};
+  if(min>=25&&hasFit) return {level:5,suit:fitSuit,reason:'Minör oyun'};
+  if(likely>=25&&hasFit&&isMajor) return {level:4,suit:fitSuit,reason:'Olası oyun'};
+  if(likely>=26) return {level:3,suit:'NT',reason:'Olası 3NT'};
+  
+  // Invite
+  if(min>=22&&hasFit&&isMajor) return {level:3,suit:fitSuit,reason:'Davet (22+ HCP)'};
+  if(min>=22) return {level:2,suit:'NT',reason:'2NT davet'};
+  
+  // Partscore
+  if(hasFit) return {level:2,suit:fitSuit,reason:'Partscore'};
+  return {level:1,suit:'NT',reason:'Minimum'};
+}
+
+/* ── AGGRESSIVE TOTAL: HCP + distribution + fit bonus ───── */
+// fitLen: number of cards in agreed/shown fit suit (0 if unknown)
+function aggrTotal(st, fitLen=0){
+  const{hcp,dist,cnt}=st;
+  // Long suit bonus: extra for 6+ card suits beyond distribution
+  let longBonus=0;
+  Object.values(cnt).forEach(n=>{ if(n>=6)longBonus+=1; if(n>=7)longBonus+=1; });
+  // Fit bonus: when 8-card fit found, dummy points kick in
+  let fitBonus=0;
+  if(fitLen>=8) fitBonus=1;
+  if(fitLen>=9) fitBonus=2;
+  return hcp+dist+longBonus+fitBonus;
+}
+
+/* ── OPENING ─────────────────────────────────────────────── */
+function aiOpen(st){
+  const{hcp,cnt,total}=st; const sb=(l,s)=>safeBid(l,s);
+  if(hcp>=22||total>=22)          return sb(2,'C')||{bid:'PASS'};
+  if(hcp>=20&&isBalanced(cnt))    return sb(2,'NT')||{bid:'PASS'};
+  if(hcp>=15&&hcp<=17&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'};
+  // Preempts (weak 2s/3s)
+  // KURAL: 2♣ = HER ZAMAN GÜÇLÜ (22+ HCP) — zayıf 2♣ YASAK
+  // Zayıf 2: sadece ♦/♥/♠ için (2♣ değil!)
+  // Zayıf 3: tüm renkler için (3♣ dahil)
+  if(hcp>=5&&hcp<=11){
+    // 7 kartlı: 3 seviye preempt (3♣ dahil)
+    for(const s of SK) if(cnt[s]>=7){const b=sb(3,s);if(b)return b;}
+    // 6 kartlı: 2 seviye preempt — AMA 2♣ DEĞİL (sadece ♦/♥/♠)
+    const preemptSuits=['S','H','D']; // ♣ hariç!
+    for(const s of preemptSuits) if(cnt[s]>=6){const b=sb(2,s);if(b)return b;}
+  }
+  // Normal opening 12+
+  if(hcp>=12||total>=13){
+    if(cnt.S>=5) return sb(1,'S')||{bid:'PASS'};
+    if(cnt.H>=5) return sb(1,'H')||{bid:'PASS'};
+    if(cnt.D>=4&&cnt.D>=cnt.C) return sb(1,'D')||{bid:'PASS'};
+    return sb(1,'C')||{bid:'PASS'};
+  }
+  return{bid:'PASS'};
+}
+
+/* ── FIRST RESPONSE (aggressive) ────────────────────────── */
+function aiFirstResponse(st, pLast, oppActive){
+  const{hcp,cnt}=st;
+  const tot=aggrTotal(st); // use total pts for fit decisions
+  const sb=(l,s)=>safeBid(l,s);
+  const pb=pLast.bid; const psym=pb.slice(1); const plvl=lvlOf(pb);
+  const psk=suitOf(pb);
+
+  // Response to 2C (strong, forcing)
+  if(pb==='2♣'||pb===bstr(2,'C')){
+    if(cnt.S>=5&&hcp>=6) return sb(2,'S')||{bid:'PASS'};
+    if(cnt.H>=5&&hcp>=6) return sb(2,'H')||{bid:'PASS'};
+    if(hcp>=6)           return sb(2,'NT')||{bid:'PASS'};
+    return sb(2,'D')||{bid:'PASS'};
+  }
+  // Response to 2NT (20-21) — Jacoby + Stayman
+  if(pb==='2NT'){
+    // Slam zone
+    if(hcp>=11) return sb(6,'NT')||{bid:'PASS'}; // 31+ combined
+    if(hcp>=9&&(cnt.S>=5||cnt.H>=5)){
+      if(cnt.H>=5) return sb(3,'D')||{bid:'PASS'}; // transfer to ♥
+      if(cnt.S>=5) return sb(3,'H')||{bid:'PASS'}; // transfer to ♠
+    }
+    // Majors with 5 cards
+    if(cnt.H>=5) return sb(3,'D')||{bid:'PASS'}; // Jacoby: 3♦→♥
+    if(cnt.S>=5) return sb(3,'H')||{bid:'PASS'}; // Jacoby: 3♥→♠
+    // 4-card majors → Stayman
+    if(cnt.S>=4||cnt.H>=4) return sb(3,'C')||{bid:'PASS'}; // Stayman over 2NT
+    // Balanced game
+    if(hcp>=4) return sb(3,'NT')||{bid:'PASS'};
+    return{bid:'PASS'};
+  }
+  // ═══ Response to 1NT (15-17) — FULL SYSTEM ═══════════════
+  // Jacoby Transfers + Stayman + Quantitative
+  if(pb==='1NT'){
+    // SLAM ZONE (combined 33+): quantitative 4NT or direct slam
+    if(hcp>=16) return sb(4,'NT')||{bid:'PASS'}; // Quantitative 4NT (slam invite)
+    if(hcp>=15) return sb(6,'NT')||{bid:'PASS'}; // Direct 6NT (33+ HCP)
+
+    // GAME ZONE: 5-card majors → Jacoby Transfer
+    // Transfer 2♦ → partner bids 2♥, then we raise
+    if(cnt.H>=6&&hcp>=8) return sb(4,'H')||{bid:'PASS'}; // direct 4H with 6+ cards
+    if(cnt.S>=6&&hcp>=8) return sb(4,'S')||{bid:'PASS'}; // direct 4S with 6+ cards
+    if(cnt.H>=5&&hcp>=8) return sb(2,'D')||{bid:'PASS'}; // Jacoby: 2♦ = transfer to ♥
+    if(cnt.S>=5&&hcp>=8) return sb(2,'H')||{bid:'PASS'}; // Jacoby: 2♥ = transfer to ♠
+
+    // GAME ZONE: 4-card majors → Stayman
+    if((cnt.S>=4||cnt.H>=4)&&hcp>=8) return sb(2,'C')||{bid:'PASS'}; // Stayman
+
+    // GAME ZONE: no major fit, balanced
+    if(hcp>=9) return sb(3,'NT')||{bid:'PASS'}; // direct 3NT game
+
+    // INVITE ZONE (8-9 HCP)
+    if(cnt.H>=5&&hcp>=7) return sb(2,'D')||{bid:'PASS'}; // transfer invite
+    if(cnt.S>=5&&hcp>=7) return sb(2,'H')||{bid:'PASS'}; // transfer invite
+    if(cnt.H>=4&&hcp>=7) return sb(2,'C')||{bid:'PASS'}; // Stayman invite
+    if(cnt.S>=4&&hcp>=7) return sb(2,'C')||{bid:'PASS'};
+    if(hcp>=7) return sb(2,'NT')||{bid:'PASS'}; // balanced invite
+
+    // SIGN-OFF: weak hand with long suit
+    if(cnt.H>=5&&hcp>=3) return sb(2,'D')||{bid:'PASS'}; // transfer to escape
+    if(cnt.S>=5&&hcp>=3) return sb(2,'H')||{bid:'PASS'};
+    if(cnt.C>=6&&hcp>=2) return sb(2,'S')||{bid:'PASS'}; // 2♠ = transfer to ♣
+    if(cnt.D>=6&&hcp>=2) return sb(2,'D')||{bid:'PASS'}; // 2♦ = transfer to ♥ (escape via transfer)
+
+    // 0-6 HCP: PASS (opener at 15-17 so combined max 23, not enough for game)
+    return{bid:'PASS'};
+  }
+  // Preempt responses: aggressive fit raises
+  if(plvl>=2 && psk && psk!=='NT'){
+    if(cnt[psk]>=4&&hcp>=8)  return sb(4,psk)||{bid:'PASS'}; // splinter raise
+    if(cnt[psk]>=3&&hcp>=8)  return sb(4,psk)||{bid:'PASS'};
+    if(cnt[psk]>=3&&hcp>=5)  return sb(plvl+1,psk)||{bid:'PASS'};
+    return{bid:'PASS'};
+  }
+  // Response to 1♠ — aggressive: use tot for fit raises
+  if(psym===SUITS.S.sym){
+    const fitTot=aggrTotal(st,cnt.S+5); // assume partner has 5
+    if(cnt.S>=5&&hcp>=14) return sb(4,'S')||{bid:'PASS'}; // splinter/direct
+    if(cnt.S>=4&&hcp>=12) return sb(3,'S')||{bid:'PASS'}; // limit raise, was 13
+    if(cnt.S>=4&&tot>=20) return sb(4,'S')||{bid:'PASS'}; // distributional game
+    if(cnt.S>=3&&hcp>=5)  return sb(2,'S')||{bid:'PASS'}; // was 6
+    if(cnt.H>=4&&hcp>=8)  return sb(2,'H')||{bid:'PASS'}; // 2/1, was 10
+    if(cnt.D>=4&&hcp>=8)  return sb(2,'D')||{bid:'PASS'};
+    if(cnt.C>=4&&hcp>=8)  return sb(2,'C')||{bid:'PASS'};
+    if(hcp>=5)            return sb(1,'NT')||{bid:'PASS'}; // was 6
+    return{bid:'PASS'};
+  }
+  // Response to 1♥
+  if(psym===SUITS.H.sym){
+    if(cnt.H>=5&&hcp>=14) return sb(4,'H')||{bid:'PASS'};
+    if(cnt.H>=4&&hcp>=12) return sb(3,'H')||{bid:'PASS'}; // was 13
+    if(cnt.H>=4&&tot>=20) return sb(4,'H')||{bid:'PASS'}; // distributional game
+    if(cnt.H>=3&&hcp>=5)  return sb(2,'H')||{bid:'PASS'}; // was 6
+    if(cnt.S>=4&&hcp>=5)  return sb(1,'S')||{bid:'PASS'};
+    if(cnt.D>=4&&hcp>=8)  return sb(2,'D')||{bid:'PASS'}; // was 10
+    if(cnt.C>=4&&hcp>=8)  return sb(2,'C')||{bid:'PASS'};
+    if(hcp>=5)            return sb(1,'NT')||{bid:'PASS'};
+    return{bid:'PASS'};
+  }
+  // Response to 1♦ / 1♣
+  if(psym===SUITS.D.sym||psym===SUITS.C.sym){
+    if(cnt.S>=4&&hcp>=5)  return sb(1,'S')||{bid:'PASS'}; // was 6
+    if(cnt.H>=4&&hcp>=5)  return sb(1,'H')||{bid:'PASS'};
+    if(psk==='D'&&cnt.D>=5&&hcp>=8) return sb(2,'D')||{bid:'PASS'}; // was 10
+    if(psk==='C'&&cnt.C>=5&&hcp>=8) return sb(2,'C')||{bid:'PASS'};
+    if(hcp>=11)           return sb(2,'NT')||{bid:'PASS'}; // was 13
+    if(hcp>=5)            return sb(1,'NT')||{bid:'PASS'};
+    return{bid:'PASS'};
+  }
+  return{bid:'PASS'};
+}
+
+/* ── COMPETITIVE OVER THEIR 1NT INTERFERENCE ───────────── */
+// If opponents double/overcall partner\u2019s 1NT, escape or compete
+function aiCompetitiveOver1NT(st, pLast, oppBid){
+  const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  // If opponent doubled our 1NT (Dbl = takeout or penalties)
+  if(oppBid.isX){
+    // Run with long suit if weak
+    if(cnt.H>=5&&hcp<=7) return sb(2,'H')||{bid:'PASS'}; // escape
+    if(cnt.S>=5&&hcp<=7) return sb(2,'S')||{bid:'PASS'};
+    if(cnt.D>=5&&hcp<=7) return sb(2,'D')||{bid:'PASS'};
+    if(cnt.C>=5&&hcp<=7) return sb(2,'C')||{bid:'PASS'};
+    if(hcp>=9) return sb(2,'NT')||{bid:'PASS'}; // strong: redouble or NT
+    return{bid:'PASS'}; // let partner decide
+  }
+  // Opponent overcalled → if we have a fit or game values, bid
+  const oppSuit=suitOf(oppBid.bid);
+  if(hcp>=9) return sb(2,'NT')||{bid:'PASS'}; // still game values
+  if(cnt.H>=5&&hcp>=6) return sb(2,'H')||{bid:'PASS'};
+  if(cnt.S>=5&&hcp>=6) return sb(2,'S')||{bid:'PASS'};
+  return{bid:'PASS'};
+}
+
+/* ── OVERCALL ────────────────────────────────────────────── */
+function aiOvercall(st, lastOppBid){
+  const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  if(hcp>=10){
+    if(cnt.S>=5) return sb(1,'S')||sb(2,'S')||{bid:'PASS'};
+    if(cnt.H>=5) return sb(1,'H')||sb(2,'H')||{bid:'PASS'};
+    if(cnt.D>=5) return sb(1,'D')||sb(2,'D')||{bid:'PASS'};
+    if(cnt.C>=5) return sb(2,'C')||{bid:'PASS'};
+    if(hcp>=16&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'};
+  }
+  return{bid:'PASS'};
+}
+
+/* ── OPENER REBID — Zone-aware ──────────────────────────── */
+function aiOpenerRebid(seat, st, myLast, pLast){
+  const{hcp,cnt}=st;
+  const tot=aggrTotal(st);
+  const sb=(l,s)=>safeBid(l,s);
+  const mySuit=suitOf(myLast.bid), myLvl=lvlOf(myLast.bid);
+  const pSuit =suitOf(pLast.bid),  pLvl =lvlOf(pLast.bid);
+  const myFit = mySuit&&mySuit!=='NT' ? aggrTotal(st, cnt[mySuit]+3) : tot;
+
+  // ── 1NT/2NT JACOBY + STAYMAN — ÖNCELİKLİ ──────────────────
+  if(myLast.bid==='1NT'){
+    if(pSuit==='D'&&pLvl===2) return sb(2,'H')||{bid:'PASS'}; // transfer→♥
+    if(pSuit==='H'&&pLvl===2) return sb(2,'S')||{bid:'PASS'}; // transfer→♠
+    if(pSuit==='S'&&pLvl===2) return sb(3,'C')||{bid:'PASS'}; // minor transfer
+    if(pSuit==='C'&&pLvl===2){ // Stayman
+      if(cnt.S>=4&&cnt.H>=4) return sb(2,'S')||{bid:'PASS'};
+      if(cnt.S>=4) return sb(2,'S')||{bid:'PASS'};
+      if(cnt.H>=4) return sb(2,'H')||{bid:'PASS'};
+      return sb(2,'D')||{bid:'PASS'};
+    }
+    if(pSuit==='NT'&&pLvl===4) return hcp>=17?sb(6,'NT')||{bid:'PASS'}:{bid:'PASS'};
+  }
+  if(myLast.bid==='2NT'){
+    if(pSuit==='D'&&pLvl===3) return sb(3,'H')||{bid:'PASS'};
+    if(pSuit==='H'&&pLvl===3) return sb(3,'S')||{bid:'PASS'};
+    if(pSuit==='C'&&pLvl===3){
+      if(cnt.S>=4) return sb(3,'S')||{bid:'PASS'};
+      if(cnt.H>=4) return sb(3,'H')||{bid:'PASS'};
+      return sb(3,'D')||{bid:'PASS'};
+    }
+  }
+
+
+  // ── ZONE ESTIMATE ──────────────────────────────────────────
+  // Partner\u2019ın gücünü tahmin et ve hedef kontratı belirle
+  const combined=combinedHCP(seat,hcp);
+  const fitSuit=mySuit&&mySuit!=='NT'?mySuit:(pSuit&&pSuit!=='NT'?pSuit:null);
+  const fitLen=fitSuit?cnt[fitSuit]:0;
+  const target=targetContract(combined, fitSuit, fitLen+(fitSuit?3:0)); // +3 partner için
+
+  // Slam bölgesi → Blackwood
+  if(target.level>=6 && fitSuit && !lastBlackwood()){
+    return sb(4,'NT')||{bid:'PASS'}; // Blackwood
+  }
+  if(target.level>=6 && !fitSuit){
+    return sb(target.level,'NT')||{bid:'PASS'};
+  }
+
+  // Partner supported our major — use combined estimate
+  if(pSuit===mySuit && (mySuit==='S'||mySuit==='H')){
+    if(target.level>=4||hcp>=17||myFit>=22) return sb(4,mySuit)||{bid:'PASS'};
+    if(target.level>=3||hcp>=15||myFit>=20) return sb(3,mySuit)||{bid:'PASS'};
+    if(hcp>=13) return sb(pLvl+1,mySuit)||{bid:'PASS'};
+    return{bid:'PASS'};
+  }
+
+  // Partner bid NT
+  if(pSuit==='NT'){
+    if(mySuit==='S'||mySuit==='H'){
+      if(hcp>=17||tot>=22) return sb(4,mySuit)||{bid:'PASS'}; // was 19
+      if(hcp>=15)          return sb(3,mySuit)||{bid:'PASS'}; // was 17
+      if(hcp>=13)          return sb(2,mySuit)||{bid:'PASS'}; // was 15
+    }
+    if(hcp>=17||tot>=22) return sb(3,'NT')||{bid:'PASS'}; // was 19
+    if(hcp>=15)          return sb(2,'NT')||{bid:'PASS'}; // was 17
+    return{bid:'PASS'};
+  }
+
+  // Partner bid a new suit (1/1 or 2/1)
+  if(pSuit && pSuit!==mySuit){
+    const pFit=cnt[pSuit]||0;
+    // Support partner\u2019s major
+    if((pSuit==='S'||pSuit==='H')&&pFit>=4){
+      if(hcp>=15||tot>=20) return sb(4,pSuit)||{bid:'PASS'}; // was 17
+      if(hcp>=12)          return sb(3,pSuit)||{bid:'PASS'}; // was 14
+      return sb(2,pSuit)||{bid:'PASS'};
+    }
+    if((pSuit==='S'||pSuit==='H')&&pFit===3){
+      if(hcp>=16) return sb(4,pSuit)||{bid:'PASS'};
+      if(hcp>=13) return sb(3,pSuit)||{bid:'PASS'};
+      return sb(2,pSuit)||{bid:'PASS'};
+    }
+    // Rebid own suit
+    if((mySuit==='S'||mySuit==='H')&&cnt[mySuit]>=6){
+      if(hcp>=15||tot>=20) return sb(3,mySuit)||{bid:'PASS'}; // was 17
+      return sb(2,mySuit)||{bid:'PASS'};
+    }
+    if(cnt[mySuit]>=5&&mySuit&&mySuit!=='NT'&&suitBidCount(seat,mySuit)<2&&hcp>=14){
+      return sb(myLvl+1,mySuit)||{bid:'PASS'};
+    }
+    // Jump shift with strong hand + fit
+    if(hcp>=17&&pFit>=4) return sb(3,pSuit)||{bid:'PASS'}; // was 19
+    // NT rebid
+    if(hcp>=16||tot>=20) return sb(2,'NT')||{bid:'PASS'}; // was 18
+    if(hcp>=12&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'}; // was 15
+    // Second suit
+    if(mySuit==='S'&&cnt.H>=4) return sb(2,'H')||{bid:'PASS'};
+    if(mySuit==='H'&&cnt.S>=4) return sb(2,'S')||{bid:'PASS'};
+    if(mySuit==='C'&&cnt.D>=4) return sb(2,'D')||{bid:'PASS'};
+    if(hcp>=11&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'}; // was 12
+  }
+
+  // Transfer/Stayman artık fonksiyon başında işleniyor
+
+  return{bid:'PASS'};
+}
+
+/* ── RESPONDER REBID — Zone-aware + Transfer completions ── */
+function aiResponderRebid(seat, st, myLast, pLast){
+  const{hcp,cnt}=st;
+  const tot=aggrTotal(st);
+  const sb=(l,s)=>safeBid(l,s);
+  const mySuit=suitOf(myLast.bid), myLvl=lvlOf(myLast.bid);
+  const pSuit =suitOf(pLast.bid),  pLvl =lvlOf(pLast.bid);
+
+  // ── ZONE ESTIMATE ──────────────────────────────────────────
+  const combined=combinedHCP(seat,hcp);
+  const fitSuit=pSuit&&pSuit!=='NT'?pSuit:(mySuit&&mySuit!=='NT'?mySuit:null);
+  const fitLen=fitSuit?(cnt[fitSuit]||0):0;
+  const target=targetContract(combined, fitSuit, fitLen+3);
+
+  // Slam bölgesi → Blackwood (sadece fit varsa)
+  if(target.level>=6 && fitSuit && !lastBlackwood()){
+    return sb(4,'NT')||{bid:'PASS'};
+  }
+
+  // Direkt oyun bölgesi (combined 25+, fit major)
+  if(target.level>=4 && fitSuit && (fitSuit==='S'||fitSuit==='H') && !lastBlackwood()){
+    return sb(4,fitSuit)||{bid:'PASS'};
+  }
+  if(target.level>=3 && !fitSuit){
+    return sb(3,'NT')||{bid:'PASS'};
+  }
+
+  // ── JACOBY TRANSFER COMPLETIONS ──────────────────────────
+  // We bid 2♦ (transfer to ♥), opener bid 2♥ → now complete
+  if(myLast.bid===bstr(2,'D') && pSuit==='H' && pLvl===2){
+    // Partner accepted 2♦ → 2♥ transfer
+    if(cnt.H>=6&&hcp>=8) return sb(4,'H')||{bid:'PASS'}; // game with 6+ hearts
+    if(cnt.H>=5&&hcp>=9) return sb(4,'H')||{bid:'PASS'}; // game invite accepted
+    if(cnt.H>=5&&hcp>=7) return sb(3,'H')||{bid:'PASS'}; // invite
+    if(cnt.H>=5) return{bid:'PASS'}; // sign-off in 2♥
+    return{bid:'PASS'};
+  }
+  // We bid 2♥ (transfer to ♠), opener bid 2♠ → now complete
+  if(myLast.bid===bstr(2,'H') && pSuit==='S' && pLvl===2){
+    if(cnt.S>=6&&hcp>=8) return sb(4,'S')||{bid:'PASS'};
+    if(cnt.S>=5&&hcp>=9) return sb(4,'S')||{bid:'PASS'};
+    if(cnt.S>=5&&hcp>=7) return sb(3,'S')||{bid:'PASS'};
+    if(cnt.S>=5) return{bid:'PASS'}; // sign-off
+    return{bid:'PASS'};
+  }
+  // We bid 2♣ (Stayman), opener denied major (2♦) → NT
+  if(myLast.bid===bstr(2,'C') && pSuit==='D' && pLvl===2){
+    if(hcp>=9) return sb(3,'NT')||{bid:'PASS'}; // game
+    return sb(2,'NT')||{bid:'PASS'}; // invite
+  }
+  // Stayman found spade fit (2♠)
+  if(myLast.bid===bstr(2,'C') && pSuit==='S' && pLvl===2){
+    if(cnt.S>=4&&hcp>=9) return sb(4,'S')||{bid:'PASS'}; // game
+    if(cnt.S>=4&&hcp>=7) return sb(3,'S')||{bid:'PASS'}; // invite
+    if(hcp>=9) return sb(3,'NT')||{bid:'PASS'}; // no spade fit, play NT
+    return sb(2,'NT')||{bid:'PASS'};
+  }
+  // Stayman found heart fit (2♥)
+  if(myLast.bid===bstr(2,'C') && pSuit==='H' && pLvl===2){
+    if(cnt.H>=4&&hcp>=9) return sb(4,'H')||{bid:'PASS'};
+    if(cnt.H>=4&&hcp>=7) return sb(3,'H')||{bid:'PASS'};
+    if(hcp>=9) return sb(3,'NT')||{bid:'PASS'};
+    return sb(2,'NT')||{bid:'PASS'};
+  }
+  // 2NT over 2NT (3♦ transfer accepted → 3♥)
+  if(myLast.bid===bstr(3,'D') && pSuit==='H' && pLvl===3){
+    if(hcp>=8) return sb(4,'H')||{bid:'PASS'};
+    return sb(4,'H')||{bid:'PASS'}; // always game after 2NT + transfer
+  }
+  if(myLast.bid===bstr(3,'H') && pSuit==='S' && pLvl===3){
+    if(hcp>=8) return sb(4,'S')||{bid:'PASS'};
+    return sb(4,'S')||{bid:'PASS'};
+  }
+
+  // Opener rebid our suit — confirmed fit, bid game more freely
+  if(pSuit===mySuit){
+    const fitTot=aggrTotal(st, cnt[mySuit]+5); // opener has 5+
+    if(hcp>=11||fitTot>=22) return sb(4,mySuit)||{bid:'PASS'}; // was 13
+    if(hcp>=9||fitTot>=20)  return sb(3,mySuit)||{bid:'PASS'}; // was 10
+    return{bid:'PASS'};
+  }
+  // Opener confirmed a major — support with 3+
+  if((pSuit==='S'||pSuit==='H')&&cnt[pSuit]>=3){
+    const fitTot=aggrTotal(st, cnt[pSuit]+5);
+    if(hcp>=11||fitTot>=22) return sb(4,pSuit)||{bid:'PASS'}; // was 13
+    if(hcp>=8||fitTot>=19)  return sb(3,pSuit)||{bid:'PASS'}; // was 10
+    return sb(2,pSuit)||{bid:'PASS'};
+  }
+  // NT bidding — slightly more aggressive
+  if(pSuit==='NT'){
+    if(hcp>=11||tot>=16) return sb(3,'NT')||{bid:'PASS'}; // was 13
+    if(hcp>=9)           return sb(2,'NT')||{bid:'PASS'}; // was 11
+    return{bid:'PASS'};
+  }
+  // Opener new suit — push to game if enough
+  if(hcp>=11||tot>=17) return sb(3,'NT')||{bid:'PASS'}; // was 13
+  if(hcp>=9&&pLvl>=2)  return sb(2,'NT')||{bid:'PASS'}; // was 11
+  // Rebid own 6-card suit
+  if(mySuit&&mySuit!=='NT'&&cnt[mySuit]>=6&&suitBidCount(seat,mySuit)<3) return sb(myLvl+1,mySuit)||{bid:'PASS'};
+  // Rebid own 5-card suit if at good level
+  if(mySuit&&mySuit!=='NT'&&cnt[mySuit]>=5&&hcp>=8&&suitBidCount(seat,mySuit)<3) return sb(myLvl+1,mySuit)||{bid:'PASS'};
+  return{bid:'PASS'};
+}
+
+/* ── LATER AUCTION (3rd bid onward, agreed suit known) ─────
+   This is the critical missing piece. Key rule:
+   Once a fit is established, bid based on combined point count.
+   If no fit, look for 3NT or pass.
+─────────────────────────────────────────────────────────── */
+function aiLaterAuction(seat, st, myLast, pLast, agreed){
+  const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  const mySuit=suitOf(myLast.bid), myLvl=lvlOf(myLast.bid);
+  const pSuit =suitOf(pLast.bid),  pLvl =lvlOf(pLast.bid);
+  const partner=partnerOf(seat);
+
+  // ── TAM AUCTION GEÇMİŞİ — sadece son bide değil, tüm geçmişe bak ──
+  const myBidsAll=history.filter(x=>x.seat===seat&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const pBidsAll =history.filter(x=>x.seat===partner&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+
+  // ── FIT TESPİTİ: agreed varsa onu kullan, yoksa partnerin son rengine bak ──
+  let fitSuit=agreed;
+  if(!fitSuit && pSuit && pSuit!=='NT' && (cnt[pSuit]||0)>=3) fitSuit=pSuit;
+  const fitLen=fitSuit ? (cnt[fitSuit]||0) : 0;
+
+  // ── COMBINED GÜÇ TAHMİNİ — merkezi altyapıyı kullan ──
+  const combined=combinedHCP(seat,hcp);
+  const target=targetContract(combined, fitSuit, fitLen+3); // partner min 3 kart fit varsayımı
+
+  // ── FORCING DURUMU ──
+  const force=currentForceStatus(seat);
+
+  // ── 1. SLAM BÖLGESİ ────────────────────────────────────────
+  if(target.level>=6 && fitSuit && fitSuit!=='NT'){
+    if(!lastBlackwood() && shouldAsk4NT(seat, st, fitSuit)){
+      const bw=sb(4,'NT'); if(bw) return bw;
+    }
+    if(combined.min>=33){
+      const slam=sb(target.level,fitSuit)||sb(6,fitSuit); if(slam) return slam;
+    }
+  }
+  if(target.level>=6 && (!fitSuit||fitSuit==='NT') && combined.min>=33){
+    const slamNT=sb(6,'NT'); if(slamNT) return slamNT;
+  }
+
+  // ── 2. OYUN BÖLGESİ — hedefe DİREKT git, aşama aşama değil ──
+  if(target.level>=4 && fitSuit && (fitSuit==='S'||fitSuit==='H')){
+    const g=sb(4,fitSuit); if(g) return g;
+  }
+  if(target.level>=5 && fitSuit && (fitSuit==='C'||fitSuit==='D')){
+    const g=sb(5,fitSuit); if(g) return g;
+  }
+  if(target.level>=3 && (!fitSuit||fitSuit==='NT')){
+    const g=sb(3,'NT'); if(g) return g;
+  }
+  // Minör fit ama NT daha güvenli olabilir (26+ dengeli)
+  if(target.level>=3 && fitSuit && (fitSuit==='C'||fitSuit==='D') && isBalanced(cnt) && combined.min>=25){
+    const g=sb(3,'NT'); if(g) return g;
+  }
+
+  // ── 3. DAVET BÖLGESİ ───────────────────────────────────────
+  if(target.level===3 && fitSuit && (fitSuit==='S'||fitSuit==='H')){
+    const inv=sb(3,fitSuit); if(inv) return inv;
+  }
+  if(target.level===2 && (!fitSuit||fitSuit==='NT')){
+    const inv=sb(2,'NT'); if(inv) return inv;
+  }
+
+  // ── 4. PARTNER YENİ RENK GÖSTERDİ — destek ara ────────────
+  if(pSuit && pSuit!==mySuit && pSuit!=='NT'){
+    if((pSuit==='S'||pSuit==='H')&&cnt[pSuit]>=3){
+      const lvl=Math.max(pLvl+1, target.level>=4?4:pLvl+1);
+      const sup=sb(lvl,pSuit); if(sup) return sup;
+      const sup2=sb(pLvl+1,pSuit); if(sup2) return sup2;
+    }
+    // Kendi uzun rengimi tekrar söyle — SADECE hedef gerçekten daha
+    // yüksek seviye gerektiriyorsa VE bu rengi 3'ten az kez söylediysem
+    const curLvlNow=Math.max(myLvl,pLvl);
+    if(mySuit&&mySuit!=='NT'&&cnt[mySuit]>=5&&suitBidCount(seat,mySuit)<3&&target.level>curLvlNow){
+      const reb=sb(myLvl+1,mySuit); if(reb) return reb;
+    }
+    // 4. renk forcing durumuysa NT dene
+    if(force){
+      const nt=sb(3,'NT')||sb(2,'NT'); if(nt) return nt;
+    }
+  }
+
+  // ── 5. PARTNER NT DEDİ — kendi rengimi teyit et ya da NT'de kal ──
+  if(pSuit==='NT'){
+    if(mySuit&&mySuit!=='NT'&&cnt[mySuit]>=5&&suitBidCount(seat,mySuit)<3){
+      const lvl=target.level>=4?4:pLvl+1;
+      const b=sb(lvl,mySuit); if(b) return b;
+    }
+  }
+
+  // ── 6. FORCING İSE ASLA PAS — güvenli devam bul ───────────
+  if(force){
+    return forcedContinuation(seat, st, fitSuit||agreed, combined);
+  }
+
+  // ── 7. KENDİ UZUN RENGİMİ SON KEZ DENE (fit yoksa, hedef haklı çıkarıyorsa) ──
+  if(mySuit&&mySuit!=='NT'&&cnt[mySuit]>=6&&suitBidCount(seat,mySuit)<3&&target.level>Math.max(myLvl,pLvl)){
+    const b=sb(myLvl+1,mySuit); if(b) return b;
+  }
+
+  // ── 8. Hiçbir şey uymuyor — auction burada bitmeli ────────
+  return{bid:'PASS'};
+}
+
+/* ════════════════════════════════════════════════════
+   LOG + DISPLAY
+════════════════════════════════════════════════════ */
+function renderLog(){
+  // Sütun sırası: dealer\u2019dan başlayarak saat yönünde
+  const colSeats=[0,1,2,3].map(j=>SEAT[(dealerIdx+j)%4]);
+  const names={N:'Kuzey',E:'Doğu',S:'Güney',W:'Batı'};
+
+  // Başlık satırını yeniden yaz
+  const head=el('logHead');
+  if(head){
+    head.innerHTML=colSeats.map((s,i)=>{
+      const isDealer=i===0;
+      const isUser=s==='N';
+      return `<th style="${isUser?'color:var(--gold2)':''}">${names[s]}${isDealer?' ★':''}${isUser?' (Siz)':''}</th>`;
+    }).join('');
+  }
+
+  // Satırları yaz — history sırası dealer\u2019dan başlar, j. sütun = colSeats[j]
+  let rows='';
+  for(let i=0;i<history.length;i+=4){
+    rows+='<tr>';
+    for(let j=0;j<4;j++){
+      const e=history[i+j];
+      const isYou=colSeats[j]==='N';
+      rows+=`<td class="${isYou?'you-col':''}">${e?fmtBid(e):'—'}</td>`;
+    }
+    rows+='</tr>';
+  }
+  el('logBody').innerHTML=rows;
+  const lw=document.querySelector('.log-wrap');
+  lw.scrollTop=lw.scrollHeight;
+}
+function fmtBid(e){
+  if(e.bid==='PASS')return'<span class="bpass">Pas</span>';
+  if(e.isX)return'<span class="bc bdbl">X</span>';
+  if(e.isXX)return'<span class="bc brdbl">XX</span>';
+  const lvl=e.bid[0],rest=e.bid.slice(1),red=(rest==='♥'||rest==='♦');
+  return`<span class="bc ${red?'bred':'bblk'}">${lvl}<span style="font-size:15px">${rest}</span></span>`;
+}
+function updateContractBar(){el('vCont').textContent=lastBidStr?(lastBidStr+(doubled?' X':'')+(redoubled?' XX':'')):'—';}
+
+/* ════════════════════════════════════════════════════
+   BIDDING CARD RENDER
+════════════════════════════════════════════════════ */
+function renderAll(showOpp){
+  renderHand('N',true);    // North = user, always visible
+  renderHand('S',showOpp); // South = AI partner, hidden during bidding
+  renderEW('E',showOpp);
+  renderEW('W',showOpp);
+}
+
+function renderHand(p,vis){
+  const c=el('h'+p);c.innerHTML='';
+  hands[p].forEach(card=>{
+    const div=document.createElement('div');
+    if(!vis){div.className='card back';}
+    else{div.className='card';const col=SUITS[card.s].col;div.innerHTML=`<div class="rank" style="color:${col}">${dr(card.r)}<span class="rsym">${SUITS[card.s].sym}</span></div><div class="sym" style="color:${col}">${SUITS[card.s].sym}</div>`;}
+    c.appendChild(div);
+  });
+}
+
+function renderEW(p,vis){
+  const c=el('h'+p);c.innerHTML='';c.removeAttribute('style');
+  if(!vis){
+    const grid=document.createElement('div');
+    grid.style.cssText='display:flex;flex-direction:column;gap:4px;align-items:center;';
+    [7,6].forEach(count=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;position:relative;';
+      for(let i=0;i<count;i++){const card=document.createElement('div');card.className='card back';card.style.cssText='width:60px;height:87px;margin-left:'+(i===0?'0':'-36px')+';';row.appendChild(card);}
+      grid.appendChild(row);
+    });
+    c.appendChild(grid);
+  } else {
+    const fan=document.createElement('div');
+    fan.style.cssText='display:flex;align-items:flex-start;justify-content:center;padding-left:44px;min-height:118px;';
+    hands[p].forEach(card=>{
+      const div=document.createElement('div');div.className='card';const col=SUITS[card.s].col;
+      div.innerHTML=`<div class="rank" style="color:${col}">${dr(card.r)}<span class="rsym">${SUITS[card.s].sym}</span></div><div class="sym" style="color:${col}">${SUITS[card.s].sym}</div>`;
+      fan.appendChild(div);
+    });
+    c.appendChild(fan);
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   FINISH BIDDING
+════════════════════════════════════════════════════ */
+function finish(){
+  gameOver=true;renderAll(false); // ihale bitti — sadece N açık kalmalı, diğerleri kapalı
+  el('ctrl').style.display='none';el('thinking').style.display='none';
+
+  const stN=stats(hands.N),stS=stats(hands.S),stE=stats(hands.E),stW=stats(hands.W);
+  const nsHcp=stN.hcp+stS.hcp,ewHcp=stE.hcp+stW.hcp;
+  const fitNS=bestFit(hands.N,hands.S),fitEW=bestFit(hands.E,hands.W);
+  const optNS=optCont(nsHcp,fitNS),optEW=optCont(ewHcp,fitEW);
+  const fc=lastBidStr||(passCount>=4?'Pas':'—');
+  const dblSfx=doubled?' X':redoubled?' XX':'';
+  const isNSF=lastBidSeat==='S'||lastBidSeat==='N';
+  const fsNS=SUITS[fitNS.suit]?SUITS[fitNS.suit].sym:fitNS.suit;
+  const fsEW=SUITS[fitEW.suit]?SUITS[fitEW.suit].sym:fitEW.suit;
+
+  let evalTxt='';
+  if(!lastBidStr){evalTxt=nsHcp>=12?`Herkes pas geçti — NS <b>${nsHcp} HCP</b> ile açılış yapabilirdi. Önerilen: <span class="chip">${optNS.str}</span>`:'Herkes pas geçti — el zayıf, pas doğru.';}
+  else if(isNSF){const fl=parseInt(fc[0])||0;if(fl<optNS.lvl-1)evalTxt=`<b>${fc}${dblSfx}</b> — çekingen. <span class="chip">${optNS.str}</span> hedeflenebilirdi.`;else if(fl>optNS.lvl)evalTxt=`<b>${fc}${dblSfx}</b> — iddialı. Güvenli hedef: <span class="chip">${optNS.str}</span>`;else evalTxt=`<b>${fc}${dblSfx}</b> — optimal seviyeye yakın.`;}
+  else{evalTxt=`<b>${fc}${dblSfx}</b> — EW kontratı. Optimal EW: <span class="chip">${optEW.str}</span>. NS defans oynuyor.`;}
+
+  el('anl').style.display='none';
+
+  // Declarer preview hesapla
+  (function(){
+    const sSymF=lastBidStr?lastBidStr.slice(1):'';
+    const decSideF=(lastBidSeat==='N'||lastBidSeat==='S')?['N','S']:['E','W'];
+    let decF=lastBidSeat;
+    for(const h of history){
+      if(!decSideF.includes(h.seat)||h.bid==='PASS'||h.isX||h.isXX)continue;
+      if(h.bid.slice(1)===sSymF){decF=h.seat;break;}
+    }
+    const dummyF=decF==='N'?'S':decF==='S'?'N':decF==='E'?'W':'E';
+    const orderF=['N','E','S','W'];
+    const diF=orderF.indexOf(decF);
+    const defLF=orderF[(diF+3)%4];
+    const cs=document.getElementById('contractSummary');
+    if(cs) cs.innerHTML=
+      `Oynayan: <b style="color:var(--gold2)">${seatName(decF)}</b> &nbsp;|&nbsp; `+
+      `Dummy: <b>${seatName(dummyF)}</b> &nbsp;|&nbsp; `+
+      `İlk Açılış: <b style="color:#e8a870">${seatName(defLF)}</b>`;
+  })();
+  // Eski buton barını sil, yenisini ekle
+  const oldBar=document.getElementById('finishBar');
+  if(oldBar) oldBar.remove();
+  const bar=document.createElement('div');
+  bar.id='finishBar';
+  bar.style.cssText='display:flex;gap:8px;margin-top:8px;width:100%;';
+  if(lastBidStr){
+    const pb=document.createElement('button');
+    pb.style.cssText='flex:2;padding:11px;background:rgba(20,70,160,0.82);color:#b0d0ff;border:1px solid rgba(100,160,255,0.45);border-radius:8px;font-family:Playfair Display,serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;';
+    pb.textContent='✦ Oyunu Oyna ✦';
+    pb.onclick=function(){startPlay();};
+    bar.appendChild(pb);
+  }
+  const nb=document.createElement('button');
+  nb.style.cssText='flex:1;padding:11px;background:rgba(22,88,56,0.68);color:#e8c97a;border:1px solid rgba(201,168,76,0.38);border-radius:8px;font-family:Playfair Display,serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;';
+  nb.textContent='✦ Sonraki El ✦';
+  nb.onclick=function(){startGame();};
+  bar.appendChild(nb);
+  el('anl').parentNode.insertBefore(bar, el('anl').nextSibling);
+}
+
+function bestFit(h1,h2){const c1=stats(h1).cnt,c2=stats(h2).cnt;let best={suit:'S',cnt:0};SK.forEach(s=>{const n=c1[s]+c2[s];if(n>best.cnt)best={suit:s,cnt:n};});return best;}
+function optCont(hcp,fit){const fs=SUITS[fit.suit]?SUITS[fit.suit].sym:fit.suit;if(hcp>=37)return{str:'7NT',lvl:7};if(hcp>=33&&fit.cnt>=8)return{str:`6${fs}`,lvl:6};if(hcp>=33)return{str:'6NT',lvl:6};if(hcp>=30&&fit.cnt>=8)return{str:`6${fs}`,lvl:6};if(hcp>=26)return{str:'3NT',lvl:3};if(hcp>=25&&fit.cnt>=8)return{str:`4${fs}`,lvl:4};if(hcp>=22&&fit.cnt>=8)return{str:`3${fs}`,lvl:3};if(hcp>=18&&fit.cnt>=8)return{str:`2${fs}`,lvl:2};if(hcp>=12)return{str:'1NT',lvl:1};return{str:'Pas',lvl:0};}
+function altList(hcp,fit){const fs=SUITS[fit.suit]?SUITS[fit.suit].sym:fit.suit;const a=[];if(hcp>=37)a.push(['7NT','Grand Slam']);if(hcp>=33&&fit.cnt>=8)a.push([`6${fs}`,'Small Slam majörde']);else if(hcp>=33)a.push(['6NT','Small Slam NT']);if(hcp>=30&&hcp<33&&fit.cnt>=8)a.push([`6${fs}`,'Slam bölgesi']);if(hcp>=26)a.push(['3NT','Oyun eli NT']);if(hcp>=25&&fit.cnt>=8)a.push([`4${fs}`,'Majör oyun eli']);if(hcp>=22&&hcp<25&&fit.cnt>=8)a.push([`3${fs}`,'Limit raise']);if(hcp>=18&&hcp<22&&fit.cnt>=8)a.push([`2${fs}`,'Partscore']);if(hcp>=12&&hcp<18)a.push(['1NT','Min açılış']);if(hcp<12)a.push(['Pas','Zayıf el']);if(!a.length)a.push(['Pas','Güç yok']);return a.slice(0,4).map(([c,w])=>`<span class="chip">${c}</span> <span style="color:var(--muted);font-size:11px">${w}</span>`).join('<br>');}
+function advice(nsHcp,ewHcp,fitNS,fitEW,optNS,optEW){const l=[];const fsNS=SUITS[fitNS.suit]?SUITS[fitNS.suit].sym:fitNS.suit;if(nsHcp>=33)l.push(`NS eli Slam gücünde (${nsHcp} HCP). Blackwood ile as sayısı sorgulanmalıydı. Optimal: <span class="chip">${optNS.str}</span>`);else if(nsHcp>=25)l.push(`NS ${nsHcp} HCP — oyun bölgesi. Hedef: <span class="chip">${optNS.str}</span>`);else if(ewHcp>nsHcp&&ewHcp>=20)l.push(`EW daha güçlü (${ewHcp} HCP). NS defansa odaklanmalı.`);else l.push(`Dengeli el. NS:${nsHcp}, EW:${ewHcp} HCP. Partscore mücadelesi.`);if(fitNS.cnt>=9)l.push(`NS ${fitNS.cnt}× ${fsNS} fiti ile koz avantajı.`);else if(fitNS.cnt>=8)l.push(`8 kartlık ${fsNS} fiti var — kozda oynamak NT\u2019den güvenli.`);else l.push(`NS\u2019de güçlü fit yok (${fitNS.cnt}× ${fsNS}) — NT tercih edilmeli.`);if(doubled)l.push('Kontr yapıldı — alt düşerse rakip bonus alır, yapılırsa iki kat puan.');if(redoubled)l.push('Surkontr — risk ve ödül dört kat.');return l.join('<br>');}
+
+
+/* ══════════════════════════════════════════════════════════════
+   BLACKWOOD — 4NT AS SORGUSU VE CEVAPLARI
+══════════════════════════════════════════════════════════════ */
+
+// Returns number of aces in a hand
+function countAces(hand){ return hand.filter(c=>c.r==='A').length; }
+
+// Check if the auction contains a 4NT bid (Blackwood ask)
+function lastBlackwood(){
+  // Find the most recent 4NT bid that is not a quantitative NT
+  for(let i=history.length-1;i>=0;i--){
+    const e=history[i];
+    if(e.bid==='4NT') return e;
+  }
+  return null;
+}
+
+// Check if a 5NT bid was asked (King ask after Blackwood)
+function lastFiveNT(){
+  const bw=lastBlackwood();
+  if(!bw) return null;
+  const idx=history.indexOf(bw);
+  for(let i=idx+1;i<history.length;i++){
+    if(history[i].bid==='5NT') return history[i];
+  }
+  return null;
+}
+
+// Has 4NT been answered already?
+function blackwoodAnswered(){
+  const bw=lastBlackwood();
+  if(!bw) return false;
+  const idx=history.indexOf(bw);
+  // Look for a 5-level bid after 4NT
+  for(let i=idx+1;i<history.length;i++){
+    const b=history[i];
+    if(b.bid!=='PASS'&&!b.isX&&!b.isXX){
+      const lvl=parseInt(b.bid[0]);
+      if(lvl===5) return true;
+    }
+  }
+  return false;
+}
+
+// Is it this seat\u2019s turn to ANSWER Blackwood?
+function mustAnswerBlackwood(seat){
+  const bw=lastBlackwood();
+  if(!bw) return false;
+  if(blackwoodAnswered()) return false;
+  // The partner of the Blackwood asker must answer
+  const asker=bw.seat;
+  const partner=asker==='N'?'S':asker==='S'?'N':asker==='E'?'W':'E';
+  return seat===partner;
+}
+
+// Is it this seat\u2019s turn to ANSWER 5NT (king ask)?
+function mustAnswerFiveNT(seat){
+  const fn=lastFiveNT();
+  if(!fn) return false;
+  const asker=fn.seat;
+  const partner=asker==='N'?'S':asker==='S'?'N':asker==='E'?'W':'E';
+  // Check not already answered
+  const idx=history.indexOf(fn);
+  for(let i=idx+1;i<history.length;i++){
+    const b=history[i];
+    if(b.bid!=='PASS'&&!b.isX&&!b.isXX) return false; // already answered
+  }
+  return seat===partner;
+}
+
+// Standard Blackwood response: 5♣=0/4, 5♦=1, 5♥=2, 5♠=3
+function blackwoodResponse(seat){
+  const aces=countAces(hands[seat]);
+  const responses={0:'C', 1:'D', 2:'H', 3:'S', 4:'C'};
+  const suitKey=responses[aces]||'C';
+  return safeBid(5,suitKey)||{bid:'PASS'};
+}
+
+// 5NT response (king ask): 6♣=0k, 6♦=1k, 6♥=2k, 6♠=3k, 6NT=4k
+function fiveNTResponse(seat){
+  const kings=hands[seat].filter(c=>c.r==='K').length;
+  const responses={0:'C', 1:'D', 2:'H', 3:'S', 4:'NT'};
+  const suitKey=responses[kings]||'C';
+  return safeBid(6,suitKey)||{bid:'PASS'};
+}
+
+// Should this seat ASK Blackwood?
+// Conditions: fit confirmed, slam range HCP (≥31 combined estimate), no 4NT yet
+function shouldAsk4NT(seat, st, agreed){
+  if(lastBlackwood()) return false; // already asked
+  if(!agreed || agreed==='NT') return false; // need fit
+  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+  const pSt=stats(hands[partner]);
+  // Estimate combined: if we\u2019re slam-inviting, assume partner has 12-14
+  // Be conservative: only ask if we personally have 18+ and fit is known
+  if(st.hcp<16) return false; // aggressive: ask Blackwood earlier
+  if(lastBidVal>=bval(4,agreed)) return false; // too high already
+  return true;
+}
+
+// After Blackwood response: decide final contract
+function afterBlackwood(seat, agreed){
+  const bw=lastBlackwood();
+  if(!bw) return null;
+  const bwIdx=history.indexOf(bw);
+  // Find the response (5-level bid by partner)
+  let responseEntry=null;
+  for(let i=bwIdx+1;i<history.length;i++){
+    const b=history[i];
+    if(b.bid!=='PASS'&&!b.isX&&!b.isXX&&parseInt(b.bid[0])===5){
+      responseEntry=b; break;
+    }
+  }
+  if(!responseEntry) return null;
+  
+  const responseSuit=suitOf(responseEntry.bid);
+  const acesMap={C:0,D:1,H:2,S:3}; // 4♣=0or4
+  let partnerAces=acesMap[responseSuit]??0;
+  const myAces=countAces(hands[seat]);
+  const totalAces=myAces+partnerAces;
+  const sb=(l,s)=>safeBid(l,s);
+  const fs=agreed||'NT';
+
+  // If response was 5♣, ambiguous (0 or 4) — ask 5NT to clarify
+  if(responseSuit==='C' && myAces>=2){
+    return sb(5,'NT')||{bid:'PASS'}; // ask king count / clarify
+  }
+
+  // Decide slam level based on aces
+  if(totalAces>=4){
+    // All aces — grand slam if HCP allows
+    if(st.hcp>=17 && fs!=='NT') return sb(7,fs)||sb(7,'NT')||{bid:'PASS'};
+    if(fs!=='NT') return sb(6,fs)||{bid:'PASS'};
+    return sb(6,'NT')||{bid:'PASS'};
+  }
+  if(totalAces===3){
+    if(fs!=='NT') return sb(6,fs)||{bid:'PASS'};
+    return sb(6,'NT')||{bid:'PASS'};
+  }
+  if(totalAces===2){
+    // Missing 2 aces — sign off at 5
+    if(fs!=='NT') return sb(5,fs)||{bid:'PASS'};
+    return sb(4,'NT')||{bid:'PASS'};
+  }
+  // Missing 3+ aces — sign off
+  if(fs!=='NT') return sb(5,fs)||{bid:'PASS'};
+  return{bid:'PASS'};
+}
+
+/* ════════════════════════════════════════════════════
+   PLAY PHASE
+════════════════════════════════════════════════════ */
+function seatName(s){return{N:'Kuzey',E:'Doğu',S:'Güney',W:'Batı'}[s]||s;}
+// KURAL:
+// - NS oynuyorsa (declarer N veya S): N ve S ikisi de AÇIK, ikisini de N (gerçek oyuncu) manuel oynar.
+// - EW oynuyorsa (declarer E veya W): sadece N (gerçek oyuncu eli) + dummy (E/W'nin karşı tarafı,
+//   açılış atağından sonra) açık. S, E, W'nin declarer olanı KAPALI — hepsini AI oynar.
+function isHuman(s){
+  const decNS=declarer==='N'||declarer==='S';
+  if(decNS) return s==='N'||s==='S'; // N, her iki NS elini de manuel oynar
+  return s==='N'; // EW oynuyorsa sadece N'in kendi eli insan kontrollü
+}
+let forceRevealAll=false; // oyun bitince "Tüm Elleri Göster" ile true olur
+function isHandVisible(s){
+  if(forceRevealAll) return true; // oyun sonrası inceleme modu
+  if(s==='N') return true; // her zaman görünür
+  const decNS=declarer==='N'||declarer==='S';
+  if(decNS) return s==='S'; // NS oynuyorsa S de her zaman açık
+  // EW oynuyorsa: sadece dummy (E/W'nin declarer olmayanı), açılış atağından sonra
+  if(s===dummy && (trickCount>0||currentTrick.length>0)) return true;
+  return false;
+}
+function revealAllHands(){
+  forceRevealAll=true;
+  renderPlay();
+}
+const RV2=r=>['2','3','4','5','6','7','8','9','T','J','Q','K','A'].indexOf(r);
+
+function startPlay(){
+  if(!lastBidStr){console.error('startPlay: no lastBidStr');return;}
+  const suitSym=lastBidStr.slice(1);
+  trump=suitSym==='NT'?null:(SK.find(s=>SUITS[s].sym===suitSym)||null);
+  contractLevel=parseInt(lastBidStr[0])||1;
+
+  // Find true declarer: first player on winning side to name the trump strain
+  const decSide=(lastBidSeat==='N'||lastBidSeat==='S')?['N','S']:['E','W'];
+  declarer=lastBidSeat; // default: whoever made the final bid
+  // Search from beginning: first mention of this suit/NT by winning side
+  for(const h of history){
+    if(!decSide.includes(h.seat)||h.bid==='PASS'||h.isX||h.isXX) continue;
+    const hSuit=h.bid.slice(1); // NT or ♠/♥/♦/♣
+    if(hSuit===suitSym){ declarer=h.seat; break; }
+  }
+  if(!decSide.includes(declarer)) declarer=lastBidSeat;
+  dummy=declarer==='N'?'S':declarer==='S'?'N':declarer==='E'?'W':'E';
+
+  // Opening lead: player to LEFT of declarer
+  // Clockwise: N→E→S→W. Physical left = one step back = (di+3)%4
+  // Example: declarer=S(idx2) → left=E(idx1) → E leads ✓
+  // Example: declarer=N(idx0) → left=W(idx3) → W leads ✓
+  const order=['N','E','S','W'];
+  const di=order.indexOf(declarer);
+  // Açılış = Declarer\u2019ın FİZİKSEL SOLUNDAN başlar
+  // Masa: N=üst, E=sağ, S=alt, W=sol
+  // S\u2019nin solu=E, N\u2019nin solu=W, E\u2019nin solu=N, W\u2019nin solu=S
+  // Formül: (di+3)%4
+  // K oynuyor → D açar, saat yönünde bir sonraki = (di+1)%4
+  defL=order[(di+1)%4]; // açılış yapan = saat yönünde sonraki
+  defR=order[(di+3)%4]; // diğer savunmacı
+
+  currentTrick=[];currentTrickSeat=defL;
+  tricksDeclarer=0;tricksDefenders=0;trickCount=0;ledSuit=null;
+  playHands={};Object.keys(hands).forEach(p=>{playHands[p]=hands[p].map(c=>({...c}));});
+  playActive=true;
+
+  el('bidWrap').style.display='none';
+  el('playWrap').classList.add('active');
+  el('scoreBar').classList.remove('active');
+  const bep2=el('bidExplain');if(bep2)bep2.style.display='none';
+
+  // Show play info banner
+  const banner=document.getElementById('playBanner');
+  if(banner){
+    const trumpStr=trump?SUITS[trump].sym:'NT';
+    const decNS2=declarer==='N'||declarer==='S';
+    banner.innerHTML=
+      `<b style="color:var(--gold2)">${seatName(declarer)}</b> oynuyor `+
+      `<span style="color:${decNS2?'#7dd87d':'#e07070'}">(${decNS2?'NS':'EW'})</span>`+
+      ` &nbsp;|&nbsp; Koz: <b style="color:var(--gold2)">${trumpStr}</b>`+
+      ` &nbsp;|&nbsp; Açılış: <b>${seatName(defL)}</b>`+
+      ` &nbsp;|&nbsp; Dummy: <b>${seatName(dummy)}</b>`;
+    banner.style.display='block';
+  }
+  renderPlay();
+  if(!isHuman(currentTrickSeat))setTimeout(aiPlay,700);
+}
+
+/* ── RENDER PLAY — S=üst, W=sol, E=sağ, N=alt (sabit) ── */
+function renderPlay(){
+  try{
+    const decNS=declarer==='N'||declarer==='S';
+
+    // Sabit pozisyon label\u2019ları güncelle
+    function setLbl(id,seat){
+      const lbl=el(id); if(!lbl)return;
+      const isDecl=seat===declarer;
+      const isDummy=seat===dummy;
+      const isOpenLead=seat===defL&&trickCount===0&&currentTrick.length===0;
+      const isActive=currentTrickSeat===seat;
+      let role='';
+      if(isDecl) role=' ★ Oynayan';
+      else if(isDummy) role=' (Dummy)';
+      else if(isOpenLead) role=' ← Açılış';
+      const nameCol=isDecl?'var(--gold2)':isDummy?'#a0c8ff':'var(--cream)';
+      lbl.innerHTML=`<span style="color:${nameCol}">${seatName(seat)}${seat==='N'?' (Siz)':''}</span>`+
+        `<span style="color:${isDecl?'var(--gold2)':'var(--muted)'};font-size:10px;margin-left:4px">${role}</span>`;
+      lbl.classList.toggle('active-turn',isActive);
+    }
+    setLbl('pLblS','S');
+    setLbl('pLblW','W');
+    setLbl('pLblE','E');
+    setLbl('pLblN','N');
+
+    // Elleri render et — sabit pozisyonlarda
+    renderPHand('ph-N','N');
+    renderPHand('ph-S','S');
+    renderPSide('ph-W-play','W');
+    renderPSide('ph-E-play','E');
+
+    // Kazanılan el sayıları
+    const nsTr=decNS?tricksDeclarer:tricksDefenders;
+    const ewTr=decNS?tricksDefenders:tricksDeclarer;
+    const tcN=el('tc-N');const tcS=el('tc-S');
+    const tcW=el('tc-W');const tcE=el('tc-E');
+    // Oynayan tarafın sayısını göster
+    if(tcS) tcS.textContent=decNS?'NS kazanılan: '+nsTr:'NS kazanılan: '+nsTr;
+    if(tcN) tcN.textContent='';
+    if(tcW) tcW.textContent=!decNS?'EW kazanılan: '+ewTr:'EW kazanılan: '+ewTr;
+    if(tcE) tcE.textContent='';
+
+    renderTrick();
+    updateContractInfo();
+  }catch(err){
+    console.error('renderPlay:',err);
+    const tc=el('trickCenter');
+    if(tc)tc.innerHTML='<div style="color:#e05252;font-size:12px;padding:10px">Hata: '+err.message+'</div>';
+  }
+}
+
+/* Horizontal suit-sorted hand (N / S sabit pozisyon) */
+function renderPHand(cid,seat){
+  const c=el(cid);c.innerHTML='';
+  // Oyun bitip "Tüm Elleri Göster" basıldıysa orijinal 13 kartlık eli göster
+  // (playHands oyun sırasında tükenmiş olur, hands ise dokunulmamış orijinal dağıtımdır)
+  const h = forceRevealAll ? (hands[seat]||[]) : playHands[seat];
+  if(!h||!h.length){c.innerHTML='<div style="color:var(--muted);font-size:11px;padding:6px">El bitti</div>';return;}
+  const visible=isHandVisible(seat);
+  const isTurn=currentTrickSeat===seat && !forceRevealAll;
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:flex-start;position:relative;padding-left:40px;min-height:87px;';
+  if(!visible){
+    // Kapalı el — sadece kart sayısı kadar arka yüz göster
+    h.forEach((_,i)=>{
+      const div=document.createElement('div');
+      div.className='pc back-p';
+      div.style.zIndex=i+1;
+      row.appendChild(div);
+    });
+    c.appendChild(row);
+    return;
+  }
+  h.forEach((card,i)=>{
+    const legal=isTurn&&isHuman(seat)&&isLegal(seat,card);
+    const div=mkPCard(card,legal,i);
+    if(legal)div.onclick=()=>humanPlay(seat,card);
+    row.appendChild(div);
+  });
+  c.appendChild(row);
+}
+
+/* Vertical suit-sorted hand (W / E sabit pozisyon) */
+function renderPSide(cid,seat){
+  const c=el(cid);c.innerHTML='';
+  const h = forceRevealAll ? (hands[seat]||[]) : playHands[seat];
+  if(!h||!h.length){c.innerHTML='<div style="color:var(--muted);font-size:11px;padding:4px">El bitti</div>';return;}
+  const visible=isHandVisible(seat);
+  const isTurn=currentTrickSeat===seat && !forceRevealAll;
+  if(!visible){
+    // Kapalı el — 7+6 grid arka yüz
+    const grid=document.createElement('div');
+    grid.style.cssText='display:flex;flex-direction:column;gap:4px;align-items:center;';
+    const counts=[Math.ceil(h.length/2),Math.floor(h.length/2)];
+    let idx=0;
+    counts.forEach(cnt=>{
+      if(cnt<=0)return;
+      const row=document.createElement('div');row.style.cssText='display:flex;position:relative;';
+      for(let i=0;i<cnt;i++){
+        const div=document.createElement('div');
+        div.className='pc back-p';
+        div.style.cssText+='width:50px;height:72px;';
+        row.appendChild(div);
+        idx++;
+      }
+      grid.appendChild(row);
+    });
+    c.appendChild(grid);
+    return;
+  }
+  SK.forEach(suit=>{
+    const sc=h.filter(x=>x.s===suit);if(!sc.length)return;
+    const row=document.createElement('div');row.className='side-suit-row-p';
+    sc.forEach((card,i)=>{
+      const legal=isTurn&&isHuman(seat)&&isLegal(seat,card);
+      const div=mkPCard(card,legal,i);div.style.width='50px';div.style.height='72px';
+      if(legal)div.onclick=()=>humanPlay(seat,card);
+      row.appendChild(div);
+    });
+    c.appendChild(row);
+  });
+}
+
+function mkPCard(card,playable,idx){
+  const div=document.createElement('div');
+  div.className='pc'+(playable?' playable':'');
+  div.style.zIndex=idx+1;
+  const col=SUITS[card.s].col;
+  const sym=SUITS[card.s].sym;
+  const r=dr(card.r);
+  div.innerHTML=
+    `<div class="pr2" style="color:${col}"><span class="prr">${r}</span><span class="prs">${sym}</span></div>`+
+    `<div class="pc-mid" style="color:${col};opacity:0.55">${sym}</div>`+
+    `<div class="pr2b" style="color:${col}"><span class="prr">${r}</span><span class="prs">${sym}</span></div>`;
+  return div;
+}
+
+/* ── TRICK CENTER ── */
+function renderTrick(){
+  const tc=el('trickCenter');
+  if(!tc) return;
+  tc.innerHTML='';
+  // Won trick stacks
+  const mkStack=(count,cssPos,label)=>{
+    const div=document.createElement('div');
+    div.style.cssText='position:absolute;display:flex;align-items:center;gap:3px;'+cssPos;
+    div.innerHTML=`<span style="font-size:10px;color:var(--gold);font-family:'Playfair Display',serif">${label}: ${count}</span>`;
+    for(let i=0;i<Math.min(count,8);i++){const m=document.createElement('div');m.className='trick-mini';m.style.marginLeft=i?'-16px':'0';m.style.zIndex=i+1;m.style.position='relative';div.appendChild(m);}
+    return div;
+  };
+  const decNSt=declarer==='N'||declarer==='S';
+  tc.appendChild(mkStack(decNSt?tricksDeclarer:tricksDefenders,'bottom:4px;left:4px;','NS'));
+  tc.appendChild(mkStack(decNSt?tricksDefenders:tricksDeclarer,'top:4px;right:4px;','EW'));
+
+  // Played cards this trick
+  // Fixed positions: S=top(tN), N=bottom(tS), W=left(tW), E=right(tE)
+  const posMap={'S':'tN','N':'tS','W':'tW','E':'tE'};
+  currentTrick.forEach(({seat,card})=>{
+    const div=document.createElement('div');
+    div.className='tcard '+(posMap[seat]||'tN');
+    const col=SUITS[card.s].col;
+    const sym2=SUITS[card.s].sym; const r2=dr(card.r);
+    div.innerHTML=
+      `<div style="font-size:13px;font-family:'Playfair Display',serif;font-weight:700;line-height:1.3;color:${col}">${r2}<br><span style="font-size:17px">${sym2}</span></div>`+
+      `<div style="font-size:24px;text-align:center;color:${col};opacity:.55;line-height:1">${sym2}</div>`+
+      `<div style="font-size:13px;font-family:'Playfair Display',serif;font-weight:700;line-height:1.3;color:${col};transform:rotate(180deg);text-align:left">${r2}<br><span style="font-size:17px">${sym2}</span></div>`;
+    tc.appendChild(div);
+  });
+
+  // Turn indicator text
+  if(trickCount<13){
+    const ind=document.createElement('div');
+    ind.style.cssText='position:absolute;bottom:46%;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gold2);font-family:"Playfair Display",serif;letter-spacing:1px;opacity:.8;white-space:nowrap;';
+    ind.textContent=seatName(currentTrickSeat)+(isHuman(currentTrickSeat)?' — Sıranız':'');
+    tc.appendChild(ind);
+  }
+}
+
+/* ── LEGAL PLAY ── */
+function isLegal(seat,card){
+  if(currentTrick.length===0)return true;
+  if(!ledSuit)return true;
+  const hasLed=playHands[seat].some(c=>c.s===ledSuit);
+  return hasLed?card.s===ledSuit:true;
+}
+
+/* ── HUMAN PLAYS ── */
+function humanPlay(seat,card){
+  if(!playActive) return;
+  if(currentTrickSeat!==seat) return;
+  if(!isHuman(seat)) return;
+  if(!isLegal(seat,card)) return;
+  playCard(seat,card);
+}
+
+/* ── PLAY A CARD ── */
+function playCard(seat,card){
+  const idx=playHands[seat].findIndex(c=>c.r===card.r&&c.s===card.s);
+  if(idx===-1)return;
+  playHands[seat].splice(idx,1);
+  if(currentTrick.length===0)ledSuit=card.s;
+  currentTrick.push({seat,card});
+  const order=['N','E','S','W'];
+  currentTrickSeat=order[(order.indexOf(seat)+1)%4];
+  renderPlay();
+  if(currentTrick.length===4)setTimeout(evalTrick,750);
+  else if(!isHuman(currentTrickSeat))setTimeout(aiPlay,550);
+}
+
+/* ── EVALUATE TRICK ── */
+function evalTrick(){
+  const winner=trickWinner(currentTrick);
+  const decl=declarer; // anlık kopya
+  const decNS2=decl==='N'||decl==='S';
+  const winnerIsNS=(winner==='N'||winner==='S');
+  const winnerOnDeclarerSide=decNS2?winnerIsNS:!winnerIsNS;
+  if(winnerOnDeclarerSide)tricksDeclarer++;else tricksDefenders++;
+  trickCount++;currentTrick=[];ledSuit=null;currentTrickSeat=winner;
+  renderPlay();
+  if(trickCount>=13){setTimeout(endPlay,600);return;}
+  if(!isHuman(currentTrickSeat))setTimeout(aiPlay,650);
+}
+
+function trickWinner(trick){
+  let best=trick[0];
+  trick.forEach(({seat,card})=>{if(cardBeats(card,best.card))best={seat,card};});
+  return best.seat;
+}
+function cardBeats(card,vs){
+  if(trump){if(card.s===trump&&vs.s!==trump)return true;if(card.s!==trump&&vs.s===trump)return false;}
+  if(card.s===vs.s)return RV2(card.r)>RV2(vs.r);
+  return false;
+}
+
+/* ── AI PLAY ── */
+function aiPlay(){
+  if(!playActive) return;
+  const seat=currentTrickSeat;
+  if(isHuman(seat)) return;
+  const h=playHands[seat];
+  if(!h||!h.length) return;
+  try{
+    playCard(seat,chooseCard(seat,h));
+  }catch(e){
+    console.error('aiPlay error:',e.message);
+    // En basit legal kartı oyna
+    const legal=h.filter(cv=>isLegal(seat,cv));
+    if(legal.length) playCard(seat,legal[0]);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DOUBLE-DUMMY SOLVER — Minimax + Alpha-Beta + Kart Denklik Sınıfları
+   Elde ≤7 kart kaldığında TÜM olası oyun ağacını arayıp kesin en
+   iyi hamleyi bulur (profesyonel briç motorlarının temel mantığı).
+   Performans için:
+   - Denk kartlar (aynı sekanstaki, sonucu değiştirmeyen kartlar)
+     tek hamle olarak denenir — dallanma çarpıcı şekilde azalır.
+   - Node/süre bütçesi aşılırsa güvenle sezgisel oyuna (chooseCard
+     içindeki mevcut kurallara) geri döner — ASLA yanlış/yarım
+     sonuç kullanılmaz, sadece bazen "en optimal değil, iyi" olur.
+══════════════════════════════════════════════════════════════ */
+const DD_MAX_CARDS=7;       // bu kadar veya az kart kaldığında kesin çözüm denenir
+const DD_MAX_NODES=200000;  // node bütçesi (güvenlik sınırı)
+const DD_MAX_MS=600;        // zaman bütçesi ms (güvenlik sınırı)
+const RANK_BY_VAL=['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+
+// seat'in suit bazında "denk" (sonuç değiştirmeyen) kartlarını gruplar,
+// her grup için sadece TEK temsilci kart döndürür → dallanma azalır
+function ddEquivalentMoves(seat, legalCards, handsState){
+  const bySuit={};
+  legalCards.forEach(c=>{(bySuit[c.s]=bySuit[c.s]||[]).push(c);});
+  const reps=[];
+  Object.keys(bySuit).forEach(suit=>{
+    const mine=bySuit[suit].slice().sort((a,b)=>RV2(b.r)-RV2(a.r));
+    const live=new Set();
+    ['N','E','S','W'].forEach(sk=>{
+      handsState[sk].forEach(c=>{ if(c.s===suit) live.add(c.r); });
+    });
+    let i=0;
+    while(i<mine.length){
+      let j=i;
+      while(j+1<mine.length){
+        const hiV=RV2(mine[j].r), loV=RV2(mine[j+1].r);
+        let clean=true;
+        for(let v=loV+1; v<hiV; v++){
+          if(live.has(RANK_BY_VAL[v])){ clean=false; break; }
+        }
+        if(clean) j++; else break;
+      }
+      reps.push(mine[i]); // grubun en yükseği temsilci
+      i=j+1;
+    }
+  });
+  return reps;
+}
+
+function ddIsLegal(seat,card,handsState,trick,ledSuitDD){
+  if(trick.length===0) return true;
+  if(!ledSuitDD) return true;
+  const hasLed=handsState[seat].some(c=>c.s===ledSuitDD);
+  return hasLed?card.s===ledSuitDD:true;
+}
+
+function ddApplyMove(state, seat, card){
+  const newHands={N:state.hands.N,E:state.hands.E,S:state.hands.S,W:state.hands.W};
+  newHands[seat]=state.hands[seat].filter(c=>!(c.r===card.r&&c.s===card.s));
+  let ledSuitDD=state.ledSuitDD;
+  if(state.trick.length===0) ledSuitDD=card.s; // trick'in ilk kartıysa led suit belirlenir
+  const newTrick=state.trick.concat([{seat,card}]);
+  let turn, tricksDec=state.tricksDec, tricksDef=state.tricksDef, trick=newTrick;
+  if(newTrick.length===4){
+    const winner=trickWinner(newTrick);
+    const winSide=(winner===declarer||winner===dummy)?'dec':'def';
+    if(winSide==='dec') tricksDec++; else tricksDef++;
+    turn=winner; trick=[]; ledSuitDD=null;
+  } else {
+    const order=['N','E','S','W'];
+    turn=order[(order.indexOf(seat)+1)%4];
+  }
+  return {hands:newHands, trick, turn, tricksDec, tricksDef, ledSuitDD};
+}
+
+function ddSearch(state, budget, alpha, beta){
+  budget.nodes++;
+  if(budget.nodes>budget.maxNodes){ budget.aborted=true; return 0; }
+  if(budget.nodes%1000===0 && Date.now()-budget.start>budget.maxMs){ budget.aborted=true; return 0; }
+  if(state.hands.N.length===0 && state.trick.length===0) return state.tricksDec;
+
+  const seat=state.turn;
+  const isDecSide=(seat===declarer||seat===dummy);
+  const legal=state.hands[seat].filter(c=>ddIsLegal(seat,c,state.hands,state.trick,state.ledSuitDD));
+  const moves=ddEquivalentMoves(seat, legal, state.hands);
+
+  let best=isDecSide?-Infinity:Infinity;
+  for(const card of moves){
+    const child=ddApplyMove(state, seat, card);
+    const val=ddSearch(child, budget, alpha, beta);
+    if(budget.aborted) return best;
+    if(isDecSide){ if(val>best) best=val; if(best>alpha) alpha=best; }
+    else { if(val<best) best=val; if(best<beta) beta=best; }
+    if(beta<=alpha) break; // alpha-beta budama
+  }
+  return best;
+}
+
+// Kök seviye: seat için KESİN en iyi hamleyi bulur.
+// Bütçe aşılırsa veya hata olursa null döner (chooseCard sezgisel devam eder).
+function ddGetBestMove(seat){
+  try{
+    const totalRemaining=playHands[seat].length;
+    if(totalRemaining>DD_MAX_CARDS || totalRemaining===0) return null;
+
+    const budget={nodes:0,maxNodes:DD_MAX_NODES,maxMs:DD_MAX_MS,start:Date.now(),aborted:false};
+    const state0={
+      hands:{N:playHands.N.slice(),E:playHands.E.slice(),S:playHands.S.slice(),W:playHands.W.slice()},
+      trick:currentTrick.map(x=>({seat:x.seat,card:x.card})),
+      turn:seat, tricksDec:0, tricksDef:0,
+      ledSuitDD: currentTrick.length? currentTrick[0].card.s : null
+    };
+    const legal=state0.hands[seat].filter(c=>ddIsLegal(seat,c,state0.hands,state0.trick,state0.ledSuitDD));
+    const rootMoves=ddEquivalentMoves(seat, legal, state0.hands);
+    if(rootMoves.length===0) return null;
+    if(rootMoves.length===1) return rootMoves[0]; // tek seçenek — arama gereksiz
+
+    const isDecSide=(seat===declarer||seat===dummy);
+    let bestMove=null, bestScore=isDecSide?-Infinity:Infinity;
+    let alpha=-Infinity, beta=Infinity;
+
+    for(const card of rootMoves){
+      const child=ddApplyMove(state0, seat, card);
+      const val=ddSearch(child, budget, alpha, beta);
+      if(budget.aborted) return null; // yarım kalan sonucu ASLA kullanma
+      if(isDecSide){
+        if(val>bestScore){bestScore=val; bestMove=card;}
+        if(bestScore>alpha) alpha=bestScore;
+      } else {
+        if(val<bestScore){bestScore=val; bestMove=card;}
+        if(bestScore<beta) beta=bestScore;
+      }
+    }
+    return bestMove;
+  }catch(e){
+    console.error('ddGetBestMove hata:',e.message);
+    return null;
+  }
+}
+
+function chooseCard(seat,h){
+  // ── ÖNCE KESİN ÇÖZÜM DENE (double-dummy solver) ────────────
+  const exact=ddGetBestMove(seat);
+  if(exact) return exact;
+
+  // ── Bulunamadıysa (çok erken el veya bütçe aşımı) sezgisel devam ──
+  const legal=h.filter(c=>isLegal(seat,c));
+  if(!legal.length) return h[0];
+
+  const isDecl=seat===declarer||seat===dummy;
+  const isDef=seat===defL||seat===defR;
+  const partner=seat===declarer?dummy:seat===dummy?declarer:seat===defL?defR:defL;
+
+  // ── PARTNER'S LED SUIT (for defenders) ────────────────────
+  // Track what suit partner opened to follow their lead
+  const partnerBids=currentTrick.filter(e=>e.seat===partner);
+  const partnerLed=partnerBids.length>0?partnerBids[0].card.s:null;
+
+  // ── OPENING LEAD (veya sonraki her defans lead'i) ──────────
+  if(currentTrick.length===0){
+    if(isDef){
+      // SLAM SAVUNMASI: 6/7 seviyeye karşı elde As varsa HEMEN çekilmeli.
+      // (Beklemek riskli — declarer atarak Ası düşürebilir, tek şansı kaçırırız.)
+      if(contractLevel>=6){
+        const aces=legal.filter(cv=>cv.r==='A');
+        if(aces.length) return aces[0];
+      }
+      // Defender opening lead:
+      // 1. Top of a sequence (AKQ, KQJ, QJT etc.)
+      // 2. Lead partner\u2019s suit if known (2nd trick onward)
+      // 3. Longest non-trump suit, top of interior sequence
+      const nonTrump=trump?legal.filter(cv=>cv.s!==trump):legal;
+      const pool=nonTrump.length?nonTrump:legal;
+      const slen={};
+      pool.forEach(cv=>{slen[cv.s]=(slen[cv.s]||0)+1;});
+      // Prefer longest suit
+      const bestSuit=Object.keys(slen).sort((a,b)=>slen[b]-slen[a])[0];
+      const inSuit=pool.filter(cv=>cv.s===bestSuit).sort((a,b)=>RV2(b.r)-RV2(a.r));
+      // Lead top of honors sequence
+      if(inSuit.length>=2&&RV2(inSuit[0].r)>=RV2('J')) return inSuit[0];
+      // 4th best from longest suit
+      if(inSuit.length>=4) return inSuit[inSuit.length-4]||inSuit[inSuit.length-1];
+      return inSuit[0];
+    } else {
+      // Declarer/Dummy leads: longest suit, highest card
+      const slen={};
+      legal.forEach(cv=>{slen[cv.s]=(slen[cv.s]||0)+1;});
+      const bestSuit=Object.keys(slen).sort((a,b)=>slen[b]-slen[a])[0];
+      return legal.filter(cv=>cv.s===bestSuit).sort((a,b)=>RV2(b.r)-RV2(a.r))[0];
+    }
+  }
+
+  // ── FOLLOWING TO TRICK ────────────────────────────────────
+  const follow=legal.filter(cv=>cv.s===ledSuit);
+  const trumpCards=trump?legal.filter(cv=>cv.s===trump):[];
+
+  // Find current winning card
+  let curWin=currentTrick[0];
+  currentTrick.forEach(({seat:s,card:cv})=>{
+    if(cardBeats(cv,curWin.card)) curWin={seat:s,card:cv};
+  });
+
+  const partnerWinning=curWin.seat===partner;
+
+  // ── A. Follow suit ────────────────────────────────────────
+  if(follow.length){
+    if(isDef){
+      // DEFENDER RULE 1: If partner is winning → play LOW (don\u2019t waste)
+      if(partnerWinning){
+        return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      }
+      // DEFENDER RULE 2: MUST take the trick if possible
+      // Play highest winning card first (take the trick!)
+      const winning=follow.filter(cv=>cardBeats(cv,curWin.card));
+      if(winning.length){
+        // Play HIGHEST winner to ensure taking the trick
+        return winning.sort((a,b)=>RV2(b.r)-RV2(a.r))[0];
+      }
+      // Cannot win — play lowest as signal
+      return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+    } else {
+      // DECLARER/DUMMY: play efficiently
+      if(partnerWinning){
+        return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0]; // low, partner wins
+      }
+      const winning=follow.filter(cv=>cardBeats(cv,curWin.card));
+      if(winning.length){
+        return winning.sort((a,b)=>RV2(a.r)-RV2(b.r))[0]; // lowest winner
+      }
+      return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+    }
+  }
+
+  // ── B. Void in led suit ───────────────────────────────────
+  if(trump&&trumpCards.length){
+    if(!partnerWinning){
+      const trumpPlayed=currentTrick.filter(({card:cv})=>cv.s===trump);
+      if(trumpPlayed.length){
+        // Overruff only if we can beat the existing trump
+        const overruff=trumpCards.filter(cv=>cardBeats(cv,curWin.card));
+        if(overruff.length){
+          return overruff.sort((a,b)=>RV2(b.r)-RV2(a.r))[0]; // highest overruff to ensure win
+        }
+        // Can\u2019t overruff → discard lowest non-trump
+        const discard=legal.filter(cv=>cv.s!==trump);
+        return discard.length?discard.sort((a,b)=>RV2(a.r)-RV2(b.r))[0]:trumpCards.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      }
+      // Ruff — use lowest trump
+      return trumpCards.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+    }
+  }
+
+  // ── C. Discard ────────────────────────────────────────────
+  // Defender: discard from suit where partner didn\u2019t lead (keep partner\u2019s suit)
+  if(isDef&&partnerLed){
+    const notPartnerSuit=legal.filter(cv=>cv.s!==partnerLed&&cv.s!==trump);
+    if(notPartnerSuit.length) return notPartnerSuit.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+  }
+  return legal.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+}
+
+/* ── END PLAY ── */
+function endPlay(){
+  playActive=false;
+  document.getElementById('contractInfo').classList.remove('active');
+
+  const lvl=parseInt(lastBidStr[0]);
+  const suitSym=lastBidStr.slice(1);
+  const suitKey=suitSym==='NT'?'NT':(SK.find(s=>SUITS[s].sym===suitSym)||'C');
+  const req=lvl+6;
+
+  // Declarer'ı history'den yeniden türet (lastBidSeat güvenilmez)
+  const lastRealBidH=[...history].reverse().find(h=>h.bid!=='PASS'&&!h.isX&&!h.isXX);
+  if(lastRealBidH){
+    const lrSeat=lastRealBidH.seat;
+    const lrSide=(lrSeat==='N'||lrSeat==='S')?['N','S']:['E','W'];
+    let newDecl=lrSeat;
+    for(const h of history){
+      if(!lrSide.includes(h.seat)||h.bid==='PASS'||h.isX||h.isXX) continue;
+      if(h.bid.slice(1)===suitSym){newDecl=h.seat;break;}
+    }
+    declarer=newDecl;
+  }
+  const decNS=declarer==='N'||declarer==='S';
+
+  // tricksDeclarer ZATEN oynayan (declaring) tarafın el sayısını tutar
+  // (evalTrick içinde NS/EW farkı gözetmeksizin doğru sayılıyor) — bu yüzden
+  // burada decNS'e göre TEKRAR seçim yapmak YANLIŞ ve tersine çeviriyordu.
+  const decTricks = tricksDeclarer;
+  const defTricks = tricksDefenders;
+  const diff = decTricks - req;
+  const isVul = decNS ? vulNS : vulEW;
+  const dblFlag = redoubled?4:doubled?2:1;
+
+  let points=0;
+  let breakdown=[];
+
+  if(diff>=0){
+    // ── MADE CONTRACT — WBF Duplicate Scoring ──
+    // Trick score (contract tricks only)
+    // NT: 1st trick=40, rest=30; Major=30/trick; Minor=20/trick
+    // All multiplied by dblFlag (1/2/4)
+    let basePerTrick = (suitKey==='S'||suitKey==='H') ? 30 :
+                       suitKey==='NT' ? 30 : 20;
+    let trickScore = lvl * basePerTrick * dblFlag;
+    if(suitKey==='NT') trickScore = (40 + (lvl-1)*30) * dblFlag; // NT first trick = 40
+
+    // Game = trick score ≥ 100 (undoubled)
+    const rawScore = suitKey==='NT' ? (40+(lvl-1)*30) :
+                     (suitKey==='S'||suitKey==='H') ? lvl*30 : lvl*20;
+    const isGame = rawScore >= 100;
+
+    // Game/partScore bonus
+    let gameBonus = isGame ? (isVul ? 500 : 300) : 50;
+
+    // Slam bonus (on top of game bonus)
+    let slamBonus = 0;
+    if(lvl===7) slamBonus = isVul ? 1500 : 1000; // Grand Slam
+    else if(lvl===6) slamBonus = isVul ? 750 : 500; // Small Slam
+
+    // Overtrick score (above the line)
+    let overtrickPts = 0;
+    if(diff>0){
+      if(redoubled)      overtrickPts = diff * (isVul ? 400 : 200);
+      else if(doubled)   overtrickPts = diff * (isVul ? 200 : 100);
+      else               overtrickPts = diff * basePerTrick; // NT same as 30
+    }
+
+    // Insult bonus for doubled/redoubled contracts
+    const insult = redoubled ? 100 : doubled ? 50 : 0;
+
+    points = trickScore + gameBonus + slamBonus + overtrickPts + insult;
+    if(decNS) scoreNS+=points; else scoreEW+=points;
+
+    const dblStr = redoubled?' (Surkontrlu)':doubled?' (Kontrlu)':'';
+    const vulStr = isVul ? '🔴 Zoneli' : '⚪ Zonesiz';
+    breakdown=[
+      `Kontrat: <b style="color:var(--gold2)">${lastBidStr}${dblStr}</b> — ${decNS?'<span style="color:#7dd87d">Kuzey-Güney</span>':'<span style="color:#e07070">Doğu-Batı</span>'} ${vulStr}`,
+      diff===0
+        ? `<b style="color:var(--gold2)">✓ Tam kontrat</b> — ${req} el yapıldı`
+        : `<b style="color:#5dbb6e">✓ +${diff} fazla</b> — ${decTricks}/${req} el yapıldı`,
+      `Trick puanı: ${trickScore}${dblFlag>1?' (Kontr×'+dblFlag+')':''} | ${isGame?'Oyun bonusu':'Parçalı bonus'}: ${gameBonus}`,
+      slamBonus ? `${lvl===7?'Grand Slam':'Küçük Slam'} bonusu: ${slamBonus}` : '',
+      overtrickPts ? `Fazla el ×${diff}: ${overtrickPts}` : '',
+      insult ? `Kontr insult bonusu: ${insult}` : '',
+      `<b style="font-size:15px;color:${decNS?'#7dd87d':'#e07070'}">✦ Toplam: +${points} puan → ${decNS?'NS':'EW'}</b>`,
+    ].filter(Boolean);
+
+  } else {
+    // ── DOWN — WBF Undertrick Penalties ──
+    const down = Math.abs(diff);
+    let pen = 0;
+    const penLines = [];
+
+    if(redoubled){
+      // Redoubled penalties: 2× doubled
+      // Doubled non-vul: 100,200,200,300,300... 
+      // Doubled vul: 200,300,300,300...
+      // Redoubled = ×2
+      const dPens = isVul
+        ? [200,300,300,300,300,300,300,300,300,300,300,300,300]
+        : [100,200,200,300,300,300,300,300,300,300,300,300,300];
+      for(let i=0;i<down;i++) pen += (dPens[i]||300) * 2;
+      penLines.push(`Surkontrlu ceza (${isVul?'Zoneli':'Zonesiz'}): ${pen}`);
+    } else if(doubled){
+      // Doubled non-vul: 100,200,200,300,300...
+      // Doubled vul: 200,300,300,300...
+      const dPens = isVul
+        ? [200,300,300,300,300,300,300,300,300,300,300,300,300]
+        : [100,200,200,300,300,300,300,300,300,300,300,300,300];
+      for(let i=0;i<down;i++) pen += dPens[i]||300;
+      penLines.push(`Kontrlu ceza (${isVul?'Zoneli':'Zonesiz'}): ${pen}`);
+    } else {
+      // Undoubled: non-vul=50/trick, vul=100/trick
+      pen = down * (isVul ? 100 : 50);
+      penLines.push(`${isVul?'Zoneli':'Zonesiz'} ceza (${down}×${isVul?100:50}): ${pen}`);
+    }
+
+    points = pen;
+    if(decNS) scoreEW+=points; else scoreNS+=points;
+
+    const dblStr = redoubled?' (Surkontrlu)':doubled?' (Kontrlu)':'';
+    const winner = decNS?'EW':'NS';
+    breakdown=[
+      `Kontrat: <b style="color:var(--gold2)">${lastBidStr}${dblStr}</b> — ${decNS?'<span style="color:#7dd87d">Kuzey-Güney</span>':'<span style="color:#e07070">Doğu-Batı</span>'}`,
+      `<b style="color:#e05252">✗ ${down} içeri!</b> — ${decNS?'NS':'EW'} ${decTricks} el aldı, ${req} el gerekirdi`,
+      ...penLines,
+      `<b style="font-size:15px;color:${winner==='NS'?'#7dd87d':'#e07070'}">✦ Toplam: +${points} puan → ${winner}</b>`,
+    ];
+  }
+
+  // Advance dealer for next deal
+  dealerIdx++;
+  updateInfoBar();
+
+  el('scoreContent').innerHTML=`
+    <div style="line-height:1.9;font-size:13px">${breakdown.join('<br>')}</div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:20px;justify-content:center;font-family:'Playfair Display',serif;">
+      <span style="color:#7dd87d;font-size:15px;font-weight:700">NS: ${scoreNS>=0?'+':''}${scoreNS}</span>
+      <span style="color:var(--muted)">|</span>
+      <span style="color:#e07070;font-size:15px;font-weight:700">EW: ${scoreEW>=0?'+':''}${scoreEW}</span>
+    </div>`;
+  el('scoreBar').classList.add('active');
+}
+
+/* ── CONTRACT INFO PANEL ── */
+function updateContractInfo(){
+  const info=document.getElementById('contractInfo');
+  if(!info) return;
+  if(!lastBidStr||!playActive){info.classList.remove('active');return;}
+  info.classList.add('active');
+
+  // Contract display with colored suit
+  const lvl=lastBidStr[0];
+  const suitSym=lastBidStr.slice(1);
+  let suitCol='var(--cream)';
+  if(suitSym==='♥'||suitSym==='♦') suitCol='#e05252';
+  const dblMark=doubled?' <span style="color:var(--gold2)">X</span>':redoubled?' <span style="color:#e05252">XX</span>':'';
+  document.getElementById('ci-contract').innerHTML=
+    `${lvl}<span style="color:${suitCol}">${suitSym}</span>${dblMark}`;
+
+  // Which side is declarer
+  const decNS=declarer==='N'||declarer==='S';
+  const ciVul=decNS?vulNS:vulEW;
+  document.getElementById('ci-side').textContent=
+    (decNS?'Kuzey-Güney':'Doğu-Batı')+' oynuyor'+(ciVul?' 🔴 ZONELİ':'');
+
+  const req=parseInt(lastBidStr[0])+6;
+  // tricksDeclarer ZATEN oynayan tarafın el sayısıdır (NS/EW farkı gözetmeden)
+  const decTricks=tricksDeclarer;
+  const remaining=13-trickCount;
+  const needed=req-decTricks;
+  const pct=Math.min(100,Math.round((decTricks/req)*100));
+
+  const needEl=document.getElementById('ci-need');
+  const haveEl=document.getElementById('ci-have');
+  const leftEl=document.getElementById('ci-left');
+
+  needEl.textContent=req;
+  haveEl.textContent=decTricks;
+  haveEl.className='ci-val'+(decTricks>=req?' good':needed>remaining?' bad':'');
+
+  // Remaining tricks needed
+  if(needed<=0){
+    leftEl.textContent='Kontrat tamam!';leftEl.className='ci-val good';
+  } else if(needed>remaining){
+    leftEl.textContent=`${needed} gerekli, ${remaining} kaldı`;leftEl.className='ci-val bad';
+  } else {
+    leftEl.textContent=`${needed} el daha`;leftEl.className='ci-val';
+  }
+
+  document.getElementById('ci-bar').style.width=pct+'%';
+}
+
+/* ════════════════════════════════════════════════════
+   BID EXPLANATION ENGINE
+════════════════════════════════════════════════════ */
+function showBidExplain(entry){
+  const panel=el('bidExplain');
+  if(!panel) return;
+  panel.style.display='block';
+
+  const seat=entry.seat;
+  const bid=entry.bid;
+  const isNS=seat==='N'||seat==='S';
+  const seatInitial={'N':'K','E':'D','S':'G','W':'B'}[seat]||seat;
+  const sideClass=isNS?'ns':'ew';
+
+  let bidTag='', explanation='';
+
+  // ── Jacoby Transfer açıklamaları ──────────────────────────
+  const lastRealBid=[...history].slice(0,-1).reverse()
+    .find(x=>x.bid!=='PASS'&&!x.isX&&!x.isXX);
+
+  if(!entry.isX&&!entry.isXX&&lastRealBid&&lastRealBid.bid==='1NT'){
+    if(bid===bstr(2,'D')){
+      bidTag='2♦'; explanation='Jacoby Transfer → partner 2♥ der. 5+ Kupa, herhangi bir güç.';
+    } else if(bid===bstr(2,'H')){
+      bidTag='2♥'; explanation='Jacoby Transfer → partner 2♠ der. 5+ Maça, herhangi bir güç.';
+    } else if(bid===bstr(2,'C')){
+      bidTag='2♣'; explanation='Stayman — 4+ kartlı majör aranıyor. Partner 2♦/2♥/2♠ der.';
+    } else if(bid==='2NT'){
+      bidTag='2NT'; explanation='1NT\u2019e davet. Dengeli el, 8-9 onör puan.';
+    } else if(bid==='4NT'){
+      bidTag='4NT'; explanation='Quantitative — slam daveti. Dengeli el, 15-16 onör puan.';
+    }
+    if(bidTag){
+      _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+      return;
+    }
+  }
+
+  // ── Blackwood ─────────────────────────────────────────────
+  if(bid==='4NT'&&lastRealBid&&lastRealBid.bid!=='1NT'){
+    bidTag='4NT';
+    explanation='Blackwood — As sorgusu. Koz fiti bulundu, slem araştırıyor.';
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+  const bw=lastBlackwood();
+  if(!entry.isX&&!entry.isXX&&parseInt(bid[0])===5&&bw){
+    const acesShown={'♣':'0 veya 4','♦':'1','♥':'2','♠':'3'}[bid.slice(1)]||'?';
+    bidTag=bid;
+    explanation='Blackwood cevabı — '+acesShown+' As.';
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+  if(bid==='5NT'){
+    bidTag='5NT';
+    explanation='Kral sorgusu — kaç Kral var? (5NT sonrası 6♣=0K, 6♦=1K, 6♥=2K, 6♠=3K, 6NT=4K)';
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+  const fn=lastFiveNT&&lastFiveNT();
+  if(!entry.isX&&!entry.isXX&&parseInt(bid[0])===6&&fn){
+    const kingsShown={'♣':'0','♦':'1','♥':'2','♠':'3','NT':'4'}[bid.slice(1)]||'?';
+    bidTag=bid;
+    explanation='5NT cevabı — '+kingsShown+' Kral.';
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+
+  // ── X / XX ────────────────────────────────────────────────
+  if(entry.isX){
+    bidTag='X';
+    // Negatif double mı, penalty mi, takeout mı?
+    const lastR=[...history].reverse().find(x=>x.bid!=='PASS'&&!x.isX&&!x.isXX&&x!==entry);
+    const oppOfSeat=(isNS?['E','W']:['N','S']);
+    if(lastR&&oppOfSeat.includes(lastR.seat)){
+      const oppSuit=suitOf(lastR.bid);
+      if(oppSuit==='S') explanation='Negatif Double — 4+ Kupa, 8+ onör puan.';
+      else if(oppSuit==='H') explanation='Negatif Double — 4+ Maça, 8+ onör puan.';
+      else if(oppSuit==='D'||oppSuit==='C') explanation='Negatif Double — 4+ kartlı majör(ler), 8+ onör puan.';
+      else explanation='Takeout Double — diğer renklerde güç, 12+ onör puan.';
+    } else {
+      explanation='Kontr — rakibin kontratını tehdit ediyor. 13+ onör puan veya güçlü defans eli.';
+    }
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+  if(entry.isXX){
+    bidTag='XX';
+    explanation='Surkontr — kontratın yapılacağına güven. Puan dört katına çıkar.';
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+  if(bid==='PASS'){
+    bidTag='PAS';
+    // Pas açıklaması: kaçıncı pas, hangi aşamada
+    const realBids=history.filter(x=>x.bid!=='PASS'&&!x.isX&&!x.isXX);
+    if(realBids.length===0) explanation='Açılış gücü yok. 11 ve altı onör puan.';
+    else explanation='Bu aşamada devam etmek için yeterli güç yok.';
+    _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+    return;
+  }
+
+  // ── Gerçek bid — aralık bazlı açıklama ───────────────────
+  const lvl=parseInt(bid[0]);
+  const suitSym=bid.slice(1);
+  const suitKey=suitSym==='NT'?'NT':(SK.find(s=>SUITS[s].sym===suitSym)||'C');
+  const suitName={'S':'Maça','H':'Kupa','D':'Karo','C':'Sinek','NT':'Koz Yok'}[suitKey]||suitSym;
+  bidTag=bid;
+
+  const myBids=history.filter(x=>x.seat===seat&&x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const pBids=history.filter(x=>{
+    const p=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
+    return x.seat===p&&x.bid!=='PASS'&&!x.isX&&!x.isXX;
+  });
+  const isFirstBid=myBids.length<=1;
+  const pLast=pBids[pBids.length-1];
+
+  // ── Açılış bidleri ────────────────────────────────────────
+  if(isFirstBid && !pLast){
+    if(suitSym==='NT'&&lvl===1)
+      explanation='Dengeli el. 15-17 onör puan, 5\u2019li majör yok.';
+    else if(suitSym==='NT'&&lvl===2)
+      explanation='Dengeli el. 20-21 onör puan.';
+    else if(suitSym==='NT'&&lvl===3)
+      explanation='Dengeli el. 25-27 onör puan.';
+    else if(suitKey==='C'&&lvl===2)
+      explanation='Güçlü açılış. 22+ onör puan veya 8+ oyun eli. Forcing.';
+    else if((suitKey==='S'||suitKey==='H')&&lvl===1)
+      explanation='5+ '+suitName+'. 12-21 onör puan. Beşli Majör açılışı.';
+    else if((suitKey==='D'||suitKey==='C')&&lvl===1)
+      explanation=suitName+' açılışı. 12-21 onör puan, 4+ kart (5\u2019li majör yok).';
+    else if(lvl===2)
+      explanation='Preempt — 6+ '+suitName+'. 6-10 onör puan. Rakibi zorluyor.';
+    else if(lvl===3)
+      explanation='Preempt — 7+ '+suitName+'. 5-10 onör puan. Rakibi zorluyor.';
+    else
+      explanation=lvl+'. seviye '+suitName+' açılışı.';
+
+  // ── Cevap bidleri ─────────────────────────────────────────
+  } else if(isFirstBid && pLast){
+    const pSym=pLast.bid.slice(1);
+    const pSuitKey=pSym==='NT'?'NT':(SK.find(s=>SUITS[s].sym===pSym)||'C');
+    const pName={'S':'Maça','H':'Kupa','D':'Karo','C':'Sinek','NT':'NT'}[pSuitKey]||pSym;
+
+    if(suitKey==='NT'&&lvl===1)
+      explanation=pLast.bid+'\u2019e yanıt. Dengeli el, 6-9 onör puan, '+pName+' desteği yok.';
+    else if(suitKey==='NT'&&lvl===2)
+      explanation=pLast.bid+'\u2019e davet. Dengeli el, 11-12 onör puan.';
+    else if(suitKey==='NT'&&lvl===3)
+      explanation=pLast.bid+'\u2019e direkt oyun. 13-15 onör puan, fit yok.';
+    else if(suitKey===pSuitKey&&lvl===2)
+      explanation=pName+' desteği (raise). 3+ kart, 6-9 onör puan.';
+    else if(suitKey===pSuitKey&&lvl===3)
+      explanation=pName+' limit raise. 3+ kart, 10-12 onör puan.';
+    else if(suitKey===pSuitKey&&lvl===4)
+      explanation=pName+' direkt oyun. 4+ kart, 13+ onör puan.';
+    else if(lvl===1)
+      explanation='Yeni renk — 4+ '+suitName+'. 6+ onör puan. Forcing.';
+    else if(lvl===2)
+      explanation='2/1 cevap — 4+ '+suitName+'. 10+ onör puan. Game-forcing.';
+    else if(lvl===4&&(suitKey==='S'||suitKey==='H'))
+      explanation='Splinter veya direkt oyun — '+suitName+'. 5+ kart, 12+ onör puan.';
+    else
+      explanation=pLast.bid+'\u2019e cevap — '+suitName+'.';
+
+  // ── Rebid / devam bidleri ─────────────────────────────────
+  } else {
+    if(suitKey==='NT'&&lvl===1)
+      explanation='Dengeli el rebidi. 12-14 onör puan, fit yok.';
+    else if(suitKey==='NT'&&lvl===2)
+      explanation='Güçlü NT rebid. 18-19 onör puan.';
+    else if(suitKey==='NT'&&lvl===3)
+      explanation='Oyun bölgesi. 20+ onör puan, dengeli.';
+    else if(lvl===4&&(suitKey==='S'||suitKey==='H'))
+      explanation=suitName+' oyunu. 8+ kart fiti, oyun bölgesi.';
+    else if(lvl>=6)
+      explanation=(lvl===7?'Grand Slam':'Küçük Slam')+' — '+suitName+'. Güçlü el.';
+    else if(lvl===4&&suitKey==='NT')
+      explanation='Blackwood — As sorgusu.';
+    else
+      explanation=(lvl<=2?'Minimum':'Güçlü')+' rebid — '+suitName+'.';
+  }
+
+  _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
+}
+
+function _appendExplain(panel,init,cls,tag,exp){
+  const div=document.createElement('div');
+  div.className='be-entry';
+  div.innerHTML=
+    '<span class="be-seat '+cls+'">'+init+':</span>'+
+    '<span class="be-bid-tag">'+tag+'</span>'+
+    '<span class="be-text">= '+exp+'</span>';
+  panel.appendChild(div);
+  panel.scrollTop=panel.scrollHeight;
+}
+
+function seatNameShort(s){return{N:'Kuzey',E:'Doğu',S:'Güney',W:'Batı'}[s]||s;}
+
+/* ════════════════════════════════════════════════════
+   START
+════════════════════════════════════════════════════ */
+startGame();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW kayıt hatası:', err));
+  });
+}
+</script>
+</body>
+</html>
