@@ -22,10 +22,16 @@
   --panel:rgba(0,0,0,0.42);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;}
 body{
   background:#061a0d;font-family:'EB Garamond',Georgia,serif;
+  margin:0;padding:0;height:100%;overflow:hidden;
+  color:var(--cream);
+}
+#appRoot{
   min-height:100vh;display:flex;flex-direction:column;align-items:center;
-  padding:18px 10px 50px;color:var(--cream);
+  padding:18px 10px 50px;box-sizing:border-box;
+  transform-origin:top left;position:absolute;top:0;left:0;
 }
 h1{
   font-family:'Playfair Display',serif;font-size:19px;letter-spacing:4px;
@@ -265,6 +271,7 @@ h1{
 </style>
 </head>
 <body>
+<div id="appRoot">
 <h1>Briç — Standart Beşli Majör</h1>
 <div class="signature">Powered by Yuksel Akyurek</div>
 <div class="info-bar" id="infoBar">
@@ -399,6 +406,7 @@ h1{
     <div class="ci-bar" id="ci-bar" style="width:0%"></div>
   </div>
 </div>
+</div><!-- /appRoot -->
 
 <script>
 /* ════════════════════════════════════════════════════
@@ -3167,6 +3175,39 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW kayıt hatası:', err));
   });
 }
+
+/* ══════════════════════════════════════════════════════════════
+   EKRANA SIĞDIRMA — telefon/tablet uygulaması için
+   Oyun sabit genişlikte tasarlandığından, #appRoot'u ekran
+   boyutuna göre otomatik ölçeklendirir (dikey/yatay her ikisinde).
+════════════════════════════════════════════════════ */
+function fitToScreen(){
+  const root = document.getElementById('appRoot');
+  if(!root) return;
+  // transform, layout ölçümünü etkilemez — sıfırlamaya gerek yok (titreme olmasın)
+  const naturalW = root.scrollWidth;
+  const naturalH = root.scrollHeight;
+  if(naturalW===0 || naturalH===0) return;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const scale = Math.min(vw / naturalW, vh / naturalH);
+
+  root.style.width = naturalW + 'px';
+  root.style.transform = 'scale(' + scale + ')';
+
+  // Ölçeklenmiş içeriği ekranda ortala
+  const scaledW = naturalW * scale;
+  const scaledH = naturalH * scale;
+  root.style.left = Math.max(0, (vw - scaledW) / 2) + 'px';
+  root.style.top = Math.max(0, (vh - scaledH) / 2) + 'px';
+}
+
+window.addEventListener('load', () => setTimeout(fitToScreen, 50));
+window.addEventListener('resize', fitToScreen);
+window.addEventListener('orientationchange', () => setTimeout(fitToScreen, 200));
+// Oyun akışı DOM'u sık sık günceller (yeni el, oyun fazı vb.) — periyodik olarak da kontrol et
+setInterval(fitToScreen, 1000);
 </script>
 </body>
 </html>
