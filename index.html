@@ -118,6 +118,9 @@ h1{
 .bdbl{color:#f0d060;}.brdbl{color:#e05252;}
 .bred{color:#d94040;}.bblk{color:#ccc5b0;}
 
+.ai-level-btn{padding:5px 8px;border:1px solid rgba(201,168,76,.28);border-radius:5px;background:rgba(201,168,76,.05);color:var(--cream);font-size:10px;cursor:pointer;}
+.ai-level-btn:hover{background:rgba(201,168,76,.13);border-color:var(--gold);}
+.ai-level-btn.on{background:var(--gold);color:#111;border-color:var(--gold2);font-weight:700;}
 /* ── CONTROLS ── */
 .ctrl{background:rgba(0,0,0,0.33);border-radius:10px;padding:11px;border:1px solid rgba(255,255,255,0.06);}
 .row1,.row2{display:flex;gap:3px;justify-content:center;margin-bottom:6px;}
@@ -268,12 +271,73 @@ h1{
 .score-bar{display:none;background:rgba(0,0,0,0.5);border-radius:10px;padding:14px 18px;text-align:center;font-size:13px;line-height:1.8;border:1px solid var(--gdim);width:100%;}
 .score-bar.active{display:block;}
 .score-title{font-family:'Playfair Display',serif;color:var(--gold);font-size:15px;letter-spacing:1px;margin-bottom:8px;}
+
+/* V3.2 System Profile / Onboarding */
+.profile-btn{position:fixed;top:10px;right:10px;z-index:50;background:rgba(0,0,0,.45);border:1px solid var(--gdim);color:var(--gold2);border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer}
+.profile-overlay{position:fixed;inset:0;z-index:100;background:rgba(5,10,18,.92);display:none;align-items:center;justify-content:center;padding:18px;overflow:auto}
+.profile-overlay.show{display:flex}
+.profile-card{width:min(720px,96vw);max-height:92vh;overflow:auto;background:linear-gradient(160deg,#10203a,#07101e);border:1px solid var(--gdim);border-radius:16px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+.profile-card h2{margin:0 0 6px;color:var(--gold);font-family:'Playfair Display',serif}
+.profile-sub{margin:0 0 18px;color:#d5dbe5;font-size:13px;line-height:1.55}
+.profile-section{margin:18px 0}.profile-section h3{font-size:14px;color:var(--gold2);margin:0 0 9px}
+.profile-option{display:block;border:1px solid rgba(190,170,110,.25);border-radius:10px;padding:12px;margin:8px 0;cursor:pointer;background:rgba(255,255,255,.025)}
+.profile-option:hover{background:rgba(255,255,255,.05)}
+.profile-option input{margin-right:9px}.profile-title{font-weight:700;color:#f2f2f2}.profile-desc{display:block;margin:5px 0 0 25px;color:#bcc6d4;font-size:12px;line-height:1.45}.profile-example{display:block;margin:5px 0 0 25px;color:#e4c77a;font-size:11px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.profile-grid .profile-option{margin:0}
+.profile-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:20px;position:sticky;bottom:0;padding-top:12px;background:linear-gradient(transparent,#07101e 35%)}
+.profile-note{font-size:11px;color:#aab4c2;margin-top:8px}.profile-advanced{display:none}.profile-advanced.show{display:block}.profile-link{border:0;background:none;color:#d8b65b;cursor:pointer;padding:4px 0;font-size:12px}
+@media(max-width:600px){.profile-card{padding:18px}.profile-grid{grid-template-columns:1fr}.profile-btn{top:6px;right:6px}}
 </style>
 </head>
 <body>
+<div id="profileOverlay" class="profile-overlay" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+  <div class="profile-card">
+    <h2 id="profileTitle">Briç Sisteminizi Belirleyin</h2>
+    <p class="profile-sub" id="profileIntro">İlk kullanımda bir sistem seçin. Bu seçim cihazınızda saklanır; daha sonra <b>⚙ Sistem</b> düğmesinden istediğiniz zaman değiştirebilirsiniz.</p>
+    <div class="profile-section">
+      <h3>1. Sistem</h3>
+      <label class="profile-option"><input type="radio" name="bridgeSystem" value="sayc" checked>
+        <span class="profile-title">SAYC / 5'li Majör</span>
+        <span class="profile-desc">Briçte yaygın bir başlangıç sistemidir. 5 kartlı majör açılışlarını kullanır; yeni başlayan ve orta seviye oyuncular için anlaşılması kolaydır.</span>
+        <span class="profile-example">Örnek: 1♥ veya 1♠ açılışı 5+ kartlı majörü gösterir.</span>
+      </label>
+      <label class="profile-option"><input type="radio" name="bridgeSystem" value="two_over_one">
+        <span class="profile-title">2/1 Game Force</span>
+        <span class="profile-desc">Majör açılışına 2 seviyesinde yeni bir renkle cevap verildiğinde ortaklığı en az oyun seviyesine kadar forcing hale getirir. SAYC'e göre daha ayrıntılı ve ileri düzey bir sistemdir.</span>
+        <span class="profile-example">Örnek: 1♠ – 2♣ → 2/1 Game Force.</span>
+      </label>
+      <label class="profile-option"><input type="radio" name="bridgeSystem" value="custom">
+        <span class="profile-title">Diğer / Özel Sistem</span>
+        <span class="profile-desc">Bu sürümde temel motor SAYC kurallarını kullanır. Özel sistem desteği ilerleyen sürümlerde genişletilebilir.</span>
+      </label>
+    </div>
+    <div class="profile-section">
+      <h3>2. Konvansiyonlar</h3>
+      <div class="profile-grid">
+        <label class="profile-option"><input type="checkbox" name="conv" value="stayman" checked><span class="profile-title">Stayman</span><span class="profile-desc">1NT sonrası 2♣ ile 4 kartlı majör arar.</span><span class="profile-example">1NT – 2♣</span></label>
+        <label class="profile-option"><input type="checkbox" name="conv" value="transfer" checked><span class="profile-title">Jacoby Transfer</span><span class="profile-desc">1NT sonrası partnerden ♥ veya ♠ rengini göstermesini ister.</span><span class="profile-example">1NT – 2♦ → ♥</span></label>
+        <label class="profile-option"><input type="checkbox" name="conv" value="rkcb" checked><span class="profile-title">RKCB – 1430</span><span class="profile-desc">4NT ile Key Card'ları sorarak slam araştırması yapar.</span><span class="profile-example">4NT → 5♣ / 5♦ / 5♥ / 5♠</span></label>
+        <label class="profile-option"><input type="checkbox" name="conv" value="negative_double" checked><span class="profile-title">Negative Double</span><span class="profile-desc">Rakip araya girdiğinde gösterilemeyen renkleri ve uygun gücü belirtir.</span><span class="profile-example">1♣ – 1♠ – X</span></label>
+      </div>
+      <button class="profile-link" type="button" onclick="toggleAdvancedConventions()" id="advancedToggle">＋ İleri konvansiyonları göster</button>
+      <div class="profile-grid profile-advanced" id="advancedConventions">
+        <label class="profile-option"><input type="checkbox" name="conv" value="michaels"><span class="profile-title">Michaels Cue-Bid</span><span class="profile-desc">Rakibin rengini cue-bid ederek iki renkli eli gösteren konvansiyon.</span><span class="profile-example">1♣ – 2♣ → iki majör</span></label>
+        <label class="profile-option"><input type="checkbox" name="conv" value="unusual_2nt"><span class="profile-title">Unusual 2NT</span><span class="profile-desc">Rakibin 1 seviyesindeki renk açılışına 2NT ile iki minör gösterir.</span><span class="profile-example">1♥ – 2NT → ♣ + ♦</span></label>
+        <label class="profile-option"><input type="checkbox" name="conv" value="support_double"><span class="profile-title">Support Double</span><span class="profile-desc">Partnerin gösterdiği renkte genellikle 3 kart desteği belirtmek için kullanılır.</span><span class="profile-example">1♦ – 1♥ – 1♠ – X</span></label>
+        <label class="profile-option"><input type="checkbox" name="conv" value="responsive_double"><span class="profile-title">Responsive Double</span><span class="profile-desc">Partnerin takeout double'ından sonra rakibin teklifine karşı çok renkli eli gösterir.</span><span class="profile-example">1♣ – X – 1♥ – X</span></label>
+      </div>
+      <div class="profile-note">Başlangıç önerisi: SAYC + Stayman + Transfer + RKCB 1430 + Negative Double. İleri konvansiyonları daha sonra açabilirsiniz.</div>
+    </div>
+    <div class="profile-actions">
+      <button class="btn btn-pas" type="button" onclick="closeSystemProfile()">Vazgeç</button>
+      <button class="btn btn-bid" type="button" onclick="saveSystemProfile()">Kaydet</button>
+    </div>
+  </div>
+</div>
 <div id="appRoot">
 <h1>Briç — Standart Beşli Majör</h1>
 <div class="signature">Powered by Yuksel Akyurek</div>
+<button class="profile-btn" onclick="openSystemProfile()" aria-label="Briç sistemi ayarları">⚙ Sistem</button>
 <div class="info-bar" id="infoBar">
   <div class="ib-deal" id="ibDeal">El: 1</div>
   <div class="ib-dealer" id="ibDealer">Dağıtıcı: Kuzey</div>
@@ -346,6 +410,14 @@ h1{
 <!-- ═══ PLAY PHASE ═══ -->
 <div class="play-wrap" id="playWrap">
   <div id="playBanner" style="display:none;width:100%;background:rgba(0,0,0,0.45);border:1px solid var(--gdim);border-radius:8px;padding:7px 14px;font-family:'Playfair Display',serif;font-size:13px;text-align:center;margin-bottom:4px;color:var(--cream);letter-spacing:.5px;"></div>
+<div id="aiLevelPanel" style="display:flex;align-items:center;justify-content:center;gap:6px;margin:3px 0 6px;font-size:11px;">
+  <span style="opacity:.65;letter-spacing:1px;">AI SEVİYESİ</span>
+  <button type="button" class="ai-level-btn" data-ai-level="1" onclick="setAIDifficulty(1)">1 · Başlangıç</button>
+  <button type="button" class="ai-level-btn" data-ai-level="2" onclick="setAIDifficulty(2)">2 · Amatör</button>
+  <button type="button" class="ai-level-btn" data-ai-level="3" onclick="setAIDifficulty(3)">3 · İleri</button>
+  <button type="button" class="ai-level-btn" data-ai-level="4" onclick="setAIDifficulty(4)">4 · Usta</button>
+  <span id="aiLevelLabel" style="color:var(--gold2);min-width:58px;text-align:left;">Usta</span>
+</div>
 <div class="play-felt">
     <!-- TOP = South (S) — fixed position -->
     <div class="parea pdecl">
@@ -409,6 +481,7 @@ h1{
 </div><!-- /appRoot -->
 
 <script>
+
 /* ════════════════════════════════════════════════════
    KOD KORUMA — caydırıcı önlem (kesin/aşılamaz DEĞİL)
    Sağ tık ve geliştirici araçları kısayolları engellenir.
@@ -468,13 +541,42 @@ let selLvl=null,selSuit=null;
 let playActive=false,trump=null,declarer=null,dummy=null,contractLevel=0;
 let defL=null,defR=null,currentTrickSeat=null;
 let currentTrick=[],tricksDeclarer=0,tricksDefenders=0,trickCount=0;
-let playHands={},ledSuit=null;
+let activeAISeat=null;
+let playHands={},ledSuit=null,playHistory=[];
+
+// AI PLAY DIFFICULTY — DD is a controlled component, not the whole AI.
+// Level 1: heuristic only; Level 2: occasional DD; Level 3: frequent DD;
+// Level 4: maximum DD assistance. The AI still decides first; DD is only
+// consulted according to the selected difficulty.
+let aiDifficulty=4;
+const AI_DD_RATES={1:0.00,2:0.20,3:0.50,4:1.00};
+function setAIDifficulty(level){
+  level=Math.max(1,Math.min(4,Number(level)||4));
+  aiDifficulty=level;
+  document.querySelectorAll('[data-ai-level]').forEach(b=>{
+    b.classList.toggle('on',Number(b.dataset.aiLevel)===aiDifficulty);
+  });
+  const label=el('aiLevelLabel');
+  if(label) label.textContent=['Başlangıç','Amatör','İleri','Usta'][aiDifficulty-1];
+}
+
 
 /* ════════════════════════════════════════════════════
    HELPERS
 ════════════════════════════════════════════════════ */
 const el=id=>document.getElementById(id);
 const dr=r=>r==='T'?'10':r;
+
+// Competitive convention profile. Core SAYC remains the default; optional
+// conventions can be enabled explicitly without changing the base system.
+const CONVENTIONS = window.BRIDGE_CONVENTIONS || {
+  michaels: false,
+  unusual2NT: false,
+  responsiveDouble: true,
+  supportDouble: false,
+  penaltyDoubles: true
+};
+function conventionEnabled(name){ return !!CONVENTIONS[name]; }
 
 function bval(l,s){return l*10+SUIT_ORDER[s];}
 function bstr(l,s){return s==='NT'?l+'NT':l+SUITS[s].sym;}
@@ -527,7 +629,8 @@ function stats(h){
   let dist=0;Object.values(cnt).forEach(n=>{if(n===0)dist+=3;else if(n===1)dist+=2;else if(n===2)dist+=1;});
   return{hcp,dist,total:hcp+dist,cnt};
 }
-function isBalanced(cnt){let v=0,s=0;Object.values(cnt).forEach(n=>{if(n===0)v++;if(n===1)s++;});return v===0&&s<=1;}
+function isBalanced(cnt){const d=Object.values(cnt).sort((a,b)=>b-a).join('-');return d==='4-3-3-3'||d==='4-4-3-2'||d==='5-3-3-2';}
+function isBridgeBalanced(cnt){return isBalanced(cnt); }
 function bidSuitKey(bid){const r=bid.slice(1);if(r==='NT')return'NT';return SK.find(s=>SUITS[s].sym===r)||'C';}
 
 /* ════════════════════════════════════════════════════
@@ -739,6 +842,476 @@ function lvlOf(bid){return parseInt(bid)||0;}
 
 
 /* ══════════════════════════════════════════════════════════════
+   5-CARD MAJOR V2 — 1♠ AUCTION CORE
+   Uncontested Standard American/SAYC-style logic.
+   This layer is intentionally conservative and sits in front of
+   the older heuristic engine; it does not replace the whole AI.
+══════════════════════════════════════════════════════════════ */
+function isCleanAuctionForSpadeCore(){
+  return history.every(h=>h.bid==='PASS'||(!h.isX&&!h.isXX));
+}
+function realAuction(){
+  return history.filter(h=>h.bid!=='PASS'&&!h.isX&&!h.isXX);
+}
+function bidObj(bid){return {bid};}
+
+function fiveMajorSpadeCore(seat, st){
+  // V2.1: 1♠ family, uncontested, SAYC-style ranges.
+  // This core is deliberately narrow: it handles the first and second
+  // rounds coherently and lets the legacy engine handle unsupported cases.
+  if(!isCleanAuctionForSpadeCore()) return null;
+  const a=realAuction();
+  if(!a.length || a[0].bid!=='1♠') return null;
+  const opener=a[0].seat, responder=partnerOf(opener);
+  if(seat!==opener && seat!==responder) return null;
+  // High-priority exact continuations for common minor auctions.
+  if(a.length===4 && seat===opener && a[0].seat===seat &&
+     (a[0].bid==='1♣'||a[0].bid==='1♦') && (a[1].bid==='1♥'||a[1].bid==='1♠') &&
+     a[2].bid==='1NT' && a[3].bid===a[1].bid){
+    const fs=suitOf(a[1].bid);
+    if(cnt[fs]>=3 && hcp>=16) return sb(4,fs);
+    if(cnt[fs]>=3 && hcp>=13) return sb(3,fs);
+    if(balanced && hcp>=18) return sb(2,'NT');
+    return {bid:'PASS'};
+  }
+  if(a.length===4 && seat===opener && a[0].seat===seat &&
+     (a[0].bid==='1♣'||a[0].bid==='1♦') && lvlOf(a[1].bid)===2 &&
+     lvlOf(a[2].bid)===2 && lvlOf(a[3].bid)===2){
+    const os0=suitOf(a[0].bid), r0=suitOf(a[1].bid), o2=suitOf(a[2].bid), r3=suitOf(a[3].bid);
+    const fourth=['C','D','H','S'].find(x=>![os0,r0,o2].includes(x));
+    if(r3===fourth){
+      if(o2 && o2!=='NT' && cnt[o2]>=3) return sb(3,o2);
+      if(isBalanced(cnt) && cnt[r3]>=1 && hcp>=12) return sb(3,'NT');
+      if(o2 && o2!=='NT' && cnt[o2]>=5) return sb(3,o2);
+      if(hcp>=13) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+  }
+
+  const {hcp,cnt}=st, balanced=isBalanced(cnt), sb=(l,s)=>safeBid(l,s);
+  if(!a.length) return null;
+
+  // ---------- OPENER: 1♠ - response - rebid ----------
+  if(seat===opener && a.length===2 && a[0].seat===opener && a[1].seat===responder){
+    const r=a[1].bid, rs=suitOf(r), rl=lvlOf(r);
+
+    // 1♠-1NT: forcing NT. SAYC-style: 13-18 new suit at 2-level,
+    // 13-15 six spades -> 2♠, 18-19 balanced -> 2NT,
+    // 16-18 six spades -> 3♠, 19+ jump new suit.
+    if(r==='1NT'){
+      if(balanced && hcp>=18 && hcp<=19) return sb(2,'NT');
+      if(cnt.S>=6 && hcp>=16 && hcp<=18) return sb(3,'S');
+      if(cnt.S>=6 && hcp>=13 && hcp<=15) return sb(2,'S');
+      if(hcp>=19){
+        if(cnt.H>=4) return sb(3,'H');
+        if(cnt.D>=4) return sb(3,'D');
+        if(cnt.C>=4) return sb(3,'C');
+        if(balanced) return sb(3,'NT');
+      }
+      if(cnt.H>=4) return sb(2,'H');
+      if(cnt.D>=4) return sb(2,'D');
+      if(cnt.C>=4) return sb(2,'C');
+      if(cnt.S>=5) return sb(2,'S');
+      return null;
+    }
+
+    // 1♠-2♣/2♦/2♥: 2/1 response. In SAYC this is forcing one round;
+    // opener shows a second suit, six-card spades, or a balanced NT hand.
+    if(rl===2 && (rs==='C'||rs==='D'||rs==='H')){
+      // 18-19 balanced: 3NT after a 2/1 response.
+      if(balanced && hcp>=18 && hcp<=19) return sb(3,'NT');
+      // 19+ jump-shift in a new suit (game-forcing).
+      if(hcp>=19){
+        if(rs!=='H' && cnt.H>=4) return sb(3,'H');
+        if(rs!=='D' && cnt.D>=4) return sb(3,'D');
+        if(rs!=='C' && cnt.C>=4) return sb(3,'C');
+      }
+      // Show a 4+ second suit at the 2-level with 13-18.
+      if(hcp>=13 && hcp<=18){
+        if(rs!=='H' && cnt.H>=4) return sb(2,'H');
+        if(rs!=='D' && cnt.D>=4) return sb(2,'D');
+        if(rs!=='C' && cnt.C>=4) return sb(2,'C');
+      }
+      // Rebid 6+ spades when no better second-suit/NT description exists.
+      if(cnt.S>=6 && hcp>=16 && hcp<=18) return sb(3,'S');
+      if(cnt.S>=6 && hcp>=13 && hcp<=15) return sb(2,'S');
+      if(balanced && hcp>=13 && hcp<=14) return sb(2,'NT');
+      return null;
+    }
+
+    // 1♠-2♠: 3+ support, 13-15 simple raise; 16-18 jump raise;
+    // 19-22 game. Minimum opener passes.
+    if(r==='2♠'){
+      if(hcp>=19) return sb(4,'S');
+      if(hcp>=16) return sb(3,'S');
+      return {bid:'PASS'};
+    }
+
+    // 1♠-3♠: invitational/limit raise -> opener accepts with 16+.
+    if(r==='3♠'){
+      if(hcp>=16) return sb(4,'S');
+      return {bid:'PASS'};
+    }
+  }
+
+  // ---------- RESPONDER: first rebid after opener ----------
+  if(seat===responder && a.length===3 && a[0].seat===opener &&
+     a[1].seat===responder && a[2].seat===opener){
+    const r=a[1].bid, rebid=a[2].bid, rs=suitOf(r), ps=suitOf(rebid), pr=lvlOf(rebid);
+
+    // 1♠-1NT-2♠: opener shows 6 spades. Responder: 6-8 pass,
+    // 9-10 invite 3♠, 11+ game.
+    if(r==='1NT' && ps==='S' && pr===2){
+      if(hcp>=11) return sb(4,'S');
+      if(hcp>=9) return sb(3,'S');
+      return {bid:'PASS'};
+    }
+    // 1♠-1NT-2NT: opener 18-19. 8+ usually game; 6-7 pass.
+    if(r==='1NT' && ps==='NT' && pr===2){
+      if(hcp>=7) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+    // 1♠-1NT-2H/2D/2C: support opener's second suit or choose NT.
+    if(r==='1NT' && (ps==='H'||ps==='D'||ps==='C') && pr===2){
+      if((ps==='H'||ps==='S') && cnt[ps]>=4 && hcp>=13) return sb(4,ps);
+      if(cnt[ps]>=4 && hcp>=10) return sb(3,ps);
+      if(hcp>=10) return sb(3,'NT');
+      if(cnt[ps]>=3) return sb(2,ps);
+      return {bid:'PASS'};
+    }
+
+    // 2/1 auctions: responder must continue unless opener has reached game.
+    if((rs==='C'||rs==='D'||rs==='H') && lvlOf(r)===2){
+      // Opener rebid our 2/1 suit: support/NT/game according to strength.
+      if(ps===rs){
+        if(rs==='H' || rs==='C' || rs==='D'){
+          if(hcp>=13) return sb(4,rs==='C'||rs==='D'? 'NT':rs);
+          if(hcp>=11) return sb(3,rs);
+          return {bid:'PASS'};
+        }
+      }
+      // Opener rebid spades: 3-card support can be shown; with 5+ and 11+ game.
+      if(ps==='S'){
+        if(cnt.S>=5 && hcp>=11) return sb(4,'S');
+        if(cnt.S>=3 && hcp>=11) return sb(3,'S');
+        if(cnt.S>=3) return sb(2,'S');
+      }
+      // Opener showed a new second suit: preference or fourth-suit enquiry.
+      if((ps==='H'||ps==='D'||ps==='C') && ps!==rs){
+        // After 1♠-2/1, rebid a 5-card spade suit before defaulting to NT.
+        if(cnt.S>=5) return sb(2,'S');
+        if(cnt[ps]>=4 && hcp>=11) return sb(3,ps);
+        if(cnt[rs]>=5 && hcp>=11) return sb(3,rs);
+        if(hcp>=12) return sb(3,'NT');
+        if(cnt[rs]>=5) return sb(2,rs);
+        return {bid:'PASS'};
+      }
+      // Opener 2NT after 2/1: natural minimum (12-14). Continue to 3NT with enough values.
+      if(ps==='NT' && pr===2){
+        if(hcp>=12) return sb(3,'NT');
+        return {bid:'PASS'};
+      }
+      // Opener 3NT after 2/1: game reached.
+      if(ps==='NT' && pr===3) return {bid:'PASS'};
+    }
+  }
+
+  // ---------- V2.5 CONTINUATIONS: 3rd/4th round ----------
+  // Keep the auction meaning alive instead of falling straight through to
+  // the generic HCP target engine. This block is intentionally SAYC-based.
+  if(a.length>=4){
+    const b1=a[0].bid, b2=a[1].bid, b3=a[2].bid, b4=a[3].bid;
+    const s2=suitOf(b2), s3=suitOf(b3), s4=suitOf(b4);
+    const l2=lvlOf(b2), l3=lvlOf(b3), l4=lvlOf(b4);
+
+    // 1S-1NT-2S-... : six-card spade rebid.
+    if(b1==='1♠' && b2==='1NT' && b3==='2♠' && seat===responder){
+      if(hcp>=11) return sb(4,'S');
+      if(hcp>=9) return sb(3,'S');
+      return {bid:'PASS'};
+    }
+
+    // 1S-1NT-2NT-... : opener's 18-19 balanced rebid.
+    if(b1==='1♠' && b2==='1NT' && b3==='2NT' && seat===responder){
+      if(hcp>=8) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+
+    // 1S-1NT-2H/2D/2C. Responder now either supports the shown suit,
+    // chooses NT, or signs off. A jump in a new suit is GF and is handled
+    // conservatively as a forcing continuation.
+    if(b1==='1♠' && b2==='1NT' && l3===2 && ['H','D','C'].includes(s3) && seat===responder){
+      if((s3==='H'||s3==='D'||s3==='C') && cnt[s3]>=4){
+        if(hcp>=13) return sb(4,s3);
+        if(hcp>=10) return sb(3,s3);
+        return sb(2,s3);
+      }
+      if(hcp>=10) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+
+    // 1S-2/1-2(second suit)-... responder's second bid.
+    if(b1==='1♠' && l2===2 && ['C','D','H'].includes(s2) && seat===responder){
+      // 4th suit: artificial, forcing one round. Only choose it when it is
+      // genuinely the fourth suit and we do not have a cleaner fit/game bid.
+      const four = ['C','D','H','S'].find(x=>![s2,s3].includes(x));
+      if(l4===2 && s4===four && four!=='S'){
+        if(hcp>=13 && cnt.S>=3) return sb(3,'S');
+        return safeBid(2,four)||{bid:'PASS'};
+      }
+      // If opener rebid a different second suit, preference/fit first;
+      // a 3-level new suit is a game-forcing continuation.
+      if(s3 && s3!=='NT' && s3!==s2){
+        if(cnt.S>=3 && hcp>=11) return sb(3,'S');
+        if(cnt[s3]>=4 && hcp>=11) return sb(3,s3);
+        if(cnt[s2]>=5 && hcp>=11) return sb(3,s2);
+        if(hcp>=12) return sb(3,'NT');
+        if(cnt[s2]>=5) return sb(2,s2);
+        return {bid:'PASS'};
+      }
+      // Opener rebid our 2/1 suit: continue naturally; no false pass in a
+      // one-round-forcing auction unless game is already reached.
+      if(s3===s2){
+        if(s2==='H' && cnt.H>=5 && hcp>=11) return sb(4,'H');
+        if((s2==='C'||s2==='D') && hcp>=13) return sb(3,'NT');
+        if(hcp>=11) return sb(3,s2);
+        if(cnt.S>=3) return sb(2,'S');
+        return {bid:'PASS'};
+      }
+    }
+
+    // 1S-2/1-2D/2H-2(4th suit): opener answers the 4SF enquiry.
+    if(b1==='1♠' && l2===2 && ['C','D','H'].includes(s2) && seat===opener && a.length===5){
+      const r4=suitOf(b4), r4lvl=lvlOf(b4);
+      const is4SF = r4lvl===2 && r4 && ![s2,s3,'S'].includes(r4);
+      if(is4SF){
+        // Show 3-card spade support first; otherwise NT stopper; otherwise
+        // rebid the real long second suit. This preserves the enquiry.
+        if(cnt.S>=3) return sb(3,'S');
+        if(cnt[r4]>=1 && isBalanced(cnt) && hcp>=12) return sb(2,'NT');
+        if(s3 && s3!=='NT' && cnt[s3]>=5) return sb(3,s3);
+        if(hcp>=13) return sb(3,'NT');
+        return sb(3,s2)||{bid:'PASS'};
+      }
+    }
+
+    // 1S-2S-3S-... and 1S-3S-... : responder/opener game decisions.
+    if(b1==='1♠' && b2==='2♠' && b3==='3♠'){
+      if(seat===responder){
+        if(hcp>=12) return sb(4,'S');
+        return {bid:'PASS'};
+      }
+    }
+    if(b1==='1♠' && b2==='3♠' && seat===responder){
+      if(hcp>=11) return sb(4,'S');
+      return {bid:'PASS'};
+    }
+  }
+
+  // Keep this core out of later auctions until those continuations are
+  // explicitly encoded; the legacy engine remains the fallback.
+  return null;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   5-CARD MAJOR V2 — 1♥ AUCTION CORE
+   SAYC/Standard American, uncontested. Mirrors the 1♠ core while
+   preserving the special 1♥-1♠ natural one-level response.
+══════════════════════════════════════════════════════════════ */
+function fiveMajorHeartCore(seat, st){
+  if(!isCleanAuctionForSpadeCore()) return null;
+  const a=realAuction();
+  if(!a.length || a[0].bid!=='1♥') return null;
+  const opener=a[0].seat, responder=partnerOf(opener);
+  if(seat!==opener && seat!==responder) return null;
+  const {hcp,cnt}=st, balanced=isBalanced(cnt), sb=(l,s)=>safeBid(l,s);
+
+  // Opener's first rebid
+  if(seat===opener && a.length===2 && a[1].seat===responder){
+    const r=a[1].bid, rs=suitOf(r), rl=lvlOf(r);
+    // 1♥-1♠: natural one-level response; opener shows shape/strength.
+    if(r==='1♠'){
+      if(cnt.S>=4 && cnt.H>=5 && hcp>=13) return sb(2,'S');
+      if(balanced && hcp>=20 && hcp<=21) return sb(3,'NT');
+      if(balanced && hcp>=18 && hcp<=19) return sb(2,'NT');
+      if(cnt.H>=6 && hcp>=16 && hcp<=18) return sb(3,'H');
+      if(cnt.H>=6 && hcp>=13 && hcp<=15) return sb(2,'H');
+      if(cnt.S>=4) return hcp>=15?sb(2,'S'):sb(1,'NT');
+      if(cnt.D>=4) return sb(2,'D');
+      if(cnt.C>=4) return sb(2,'C');
+      if(balanced) return sb(1,'NT');
+      return null;
+    }
+    // 1♥-1NT: forcing NT in this implementation.
+    if(r==='1NT'){
+      if(balanced && hcp>=18 && hcp<=19) return sb(2,'NT');
+      if(cnt.H>=6 && hcp>=16 && hcp<=18) return sb(3,'H');
+      if(cnt.H>=6 && hcp>=13 && hcp<=15) return sb(2,'H');
+      if(hcp>=19){
+        if(cnt.S>=4) return sb(3,'S');
+        if(cnt.D>=4) return sb(3,'D');
+        if(cnt.C>=4) return sb(3,'C');
+        if(balanced) return sb(3,'NT');
+      }
+      if(cnt.S>=4) return sb(2,'S');
+      if(cnt.D>=4) return sb(2,'D');
+      if(cnt.C>=4) return sb(2,'C');
+      if(cnt.H>=5) return sb(2,'H');
+      return null;
+    }
+    // 1♥-2♣/2♦/2♠: 2/1 one-round forcing in the selected SAYC profile.
+    if(rl===2 && ['C','D','S'].includes(rs)){
+      if(balanced && hcp>=18 && hcp<=19) return sb(3,'NT');
+      // Reverse rebids at the two-level require extra strength.
+      // In particular, 1♥-2♣-2♠ is a reverse, not a routine 4-card suit rebid.
+      if(hcp>=17 && cnt.H>=5 && cnt.S>=4 && rs!=='S') return sb(2,'S');
+      if(hcp>=19){
+        if(rs!=='S' && cnt.S>=4) return sb(3,'S');
+        if(rs!=='D' && cnt.D>=4) return sb(3,'D');
+        if(rs!=='C' && cnt.C>=4) return sb(3,'C');
+      }
+      if(hcp>=13 && hcp<=18){
+        // Show a lower-ranking natural second suit before a reverse.
+        if(rs!=='D' && cnt.D>=4) return sb(2,'D');
+        if(rs!=='C' && cnt.C>=4) return sb(2,'C');
+      }
+      if(cnt.H>=6 && hcp>=16) return sb(3,'H');
+      if(cnt.H>=6 && hcp>=13) return sb(2,'H');
+      if(balanced && hcp>=13 && hcp<=14) return sb(2,'NT');
+      return null;
+    }
+    // Raises of hearts.
+    if(r==='2♥'){
+      if(hcp>=19) return sb(4,'H');
+      if(hcp>=16) return sb(3,'H');
+      return {bid:'PASS'};
+    }
+    if(r==='3♥'){
+      if(hcp>=16) return sb(4,'H');
+      return {bid:'PASS'};
+    }
+  }
+
+  // Responder's second bid after opener rebid.
+  if(seat===responder && a.length===3 && a[2].seat===opener){
+    const r=a[1].bid, rebid=a[2].bid, rs=suitOf(r), ps=suitOf(rebid), pr=lvlOf(rebid);
+    if(r==='1♠' && ps==='H' && pr===2){
+      if(hcp>=11) return sb(4,'H');
+      if(hcp>=9) return sb(3,'H');
+      return {bid:'PASS'};
+    }
+    if(r==='1♠' && ps==='NT' && pr===1){
+      if(hcp>=11) return sb(3,'NT');
+      if(hcp>=9) return sb(2,'NT');
+      return {bid:'PASS'};
+    }
+    if(r==='1NT' && ps==='H' && pr===2){
+      if(hcp>=11) return sb(4,'H');
+      if(hcp>=9) return sb(3,'H');
+      return {bid:'PASS'};
+    }
+    if(r==='1NT' && ps==='NT' && pr===2){
+      if(hcp>=7) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+    if(['C','D','S'].includes(rs) && lvlOf(r)===2){
+      if(ps===rs){
+        if(rs==='S' && cnt.S>=5 && hcp>=11) return sb(4,'S');
+        if(rs==='S' && cnt.S>=3 && hcp>=11) return sb(3,'S');
+        if((rs==='C'||rs==='D') && hcp>=13) return sb(3,'NT');
+        if(hcp>=11) return sb(3,rs);
+        return {bid:'PASS'};
+      }
+      if(ps==='H'){
+        if(cnt.H>=3 && hcp>=11) return sb(4,'H');
+        if(cnt.H>=3) return sb(3,'H');
+      }
+      if(ps==='S' && cnt.S>=3 && hcp>=11) return sb(3,'S');
+      if(cnt.S>=5) return sb(2,'S');
+      if(hcp>=12) return sb(3,'NT');
+      if(cnt[rs]>=5) return sb(3,rs);
+      return {bid:'PASS'};
+    }
+  }
+
+  // 3rd/4th round context for 1♥.
+  if(a.length>=4){
+    const b1=a[0].bid,b2=a[1].bid,b3=a[2].bid,b4=a[3].bid;
+    const s2=suitOf(b2),s3=suitOf(b3),s4=suitOf(b4);
+    const l2=lvlOf(b2),l3=lvlOf(b3),l4=lvlOf(b4);
+
+    // 1♥-1♠-2♥ continuations.
+    if(b1==='1♥'&&b2==='1♠'&&b3==='2♥'&&seat===responder){
+      if(hcp>=11) return sb(4,'H');
+      if(hcp>=9) return sb(3,'H');
+      return {bid:'PASS'};
+    }
+    // 1♥-1NT-2♥ continuations.
+    if(b1==='1♥'&&b2==='1NT'&&b3==='2♥'&&seat===responder){
+      if(hcp>=11) return sb(4,'H');
+      if(hcp>=9) return sb(3,'H');
+      return {bid:'PASS'};
+    }
+    // 1♥-1♠-2D/2C: responder can preference hearts, support opener's second suit,
+    // or make a forcing 3-level new-suit/NT continuation.
+    if(b1==='1♥'&&b2==='1♠'&&l3===2&&['C','D'].includes(s3)&&seat===responder){
+      if(cnt.H>=3&&hcp>=11) return sb(3,'H');
+      if(cnt[s3]>=4&&hcp>=10) return sb(3,s3);
+      if(hcp>=10) return sb(3,'NT');
+      if(cnt.H>=3) return sb(2,'H');
+      return {bid:'PASS'};
+    }
+    // 1♥-2♣-2♦-2♠-3♥: responder's next action after 4SF answer.
+    if(b1==='1♥'&&b2==='2♣'&&b3==='2♦'&&b4==='2♠'&&seat===responder&&a.length===5){
+      // 3♥ establishes the heart fit; with game values sign off in 4♥.
+      if(cnt.H>=3 && hcp>=13) return sb(4,'H');
+      if(isBalanced(cnt)&&hcp>=12) return sb(3,'NT');
+      // After opener's 3♥ response to 4SF, the fit is established;
+      // below game values the responder may pass rather than repeat 3♥.
+      return {bid:'PASS'};
+    }
+    // 1♥-2/1-second suit-X: fourth suit enquiry by responder.
+    if(b1==='1♥'&&l2===2&&['C','D','S'].includes(s2)&&seat===responder){
+      const four=['C','D','S','H'].find(x=>![s2,s3].includes(x));
+      if(l4===2&&s4===four&&four!=='H'){
+        if(hcp>=13&&cnt.H>=3) return sb(3,'H');
+        return sb(2,four)||{bid:'PASS'};
+      }
+    }
+    // Opener's answer to 4SF: support responder's major, show stopper/NT,
+    // or repeat the real second suit.
+    if(b1==='1♥'&&l2===2&&['C','D','S'].includes(s2)&&seat===opener&&a.length===4){
+      const r4=suitOf(b4),r4lvl=lvlOf(b4);
+      const is4SF=r4lvl===2&&r4&&!['H',s2,s3].includes(r4);
+      if(is4SF){
+        if(cnt[r4]>=1&&hcp>=12&&isBalanced(cnt)) return sb(3,'NT');
+        if(cnt.H>=3&&hcp>=12) return sb(3,'H');
+        if(s3&&s3!=='NT'&&cnt[s3]>=5) return sb(3,s3);
+        if(hcp>=13) return sb(3,'NT');
+        return sb(3,s2)||{bid:'PASS'};
+      }
+    }
+    // 1♥-1♠-2♥-3♥: responder's next action.
+    if(b1==='1♥'&&b2==='1♠'&&b3==='2♥'&&b4==='3♥'&&seat===responder&&a.length===5){
+      if(cnt.H>=3&&hcp>=13) return sb(4,'H');
+      if(hcp>=12&&isBalanced(cnt)) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+    // Simple heart-fit progression.
+    if(b1==='1♥'&&b2==='2♥'&&b3==='3♥'&&seat===responder){
+      if(hcp>=12) return sb(4,'H');
+      return {bid:'PASS'};
+    }
+    if(b1==='1♥'&&b2==='3♥'&&seat===responder){
+      if(hcp>=11) return sb(4,'H');
+      return {bid:'PASS'};
+    }
+  }
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════════════
    FORCING BID SİSTEMİ
    Partner'ın forcing (devam zorunlu) bidinden sonra pas geçilemez.
    Kapsanan durumlar: Jump shift (opener rebid), 2/1 yeni renk,
@@ -857,7 +1430,215 @@ function forcedContinuation(seat, st, agreedGuess, combined){
   return{bid:'PASS'};
 }
 
+function fiveMajorMinorCore(seat, st){
+  // V2.9 — complete uncontested 1♣/1♦ SAYC-style family.
+  // This layer handles opening, first rebid, responder's second bid and
+  // the most important 3rd/4th-round continuations.  Competitive auctions
+  // intentionally fall through to the competitive engine.
+  if(!isCleanAuctionForSpadeCore()) return null;
+  const a=realAuction();
+  if(!a.length || !['1♣','1♦'].includes(a[0].bid)) return null;
+  const opener=a[0].seat, responder=partnerOf(opener);
+  if(seat!==opener && seat!==responder) return null;
+  const {hcp,cnt}=st, sb=(l,s)=>safeBid(l,s), balanced=isBalanced(cnt);
+  const b=(i)=>a[i]||null, bid=(i)=>b(i)?.bid, suit=(i)=>suitOf(bid(i)), lvl=(i)=>lvlOf(bid(i));
+  const opening=bid(0), os=suit(0);
+  const response=bid(1), rs=suit(1), rl=lvl(1);
+
+  // ---------- OPENER: 1m - response ----------
+  if(seat===opener && a.length===2){
+    // 1m-1NT: 12-14 balanced; with 15-17 balanced, 1NT would have been opened.
+    if(response==='1NT'){
+      // 1m-1NT is non-forcing: a balanced minimum opener passes.
+      // 18-19 balanced rebids 2NT; stronger shapes continue naturally.
+      if(balanced && hcp>=12 && hcp<=14) return {bid:'PASS'};
+      if(hcp>=18 && hcp<=19 && balanced) return sb(2,'NT');
+      // 5+ minor rebid, otherwise natural second suit.
+      if(cnt[os]>=6) return sb(2,os);
+      const otherMinor=os==='C'?'D':'C';
+      if(cnt[otherMinor]>=4 && hcp>=12) return sb(2,otherMinor);
+      if(cnt.H>=4) return sb(1,'H');
+      if(cnt.S>=4) return sb(1,'S');
+      if(cnt[os]>=5) return sb(2,os);
+      return null;
+    }
+
+    // 1m-1H/1S: show a four-card major at the one level first.
+    if(rl===1 && (rs==='H'||rs==='S')){
+      if(cnt.H>=4 && rs!=='H') return sb(1,'H');
+      if(cnt.S>=4 && rs!=='S') return sb(1,'S');
+      if(rs==='H' && cnt.H>=4) return sb(2,'H');
+      if(rs==='S' && cnt.S>=4) return sb(2,'S');
+      if(balanced && hcp>=12 && hcp<=14) return sb(1,'NT');
+      if(cnt[os]>=6) return sb(2,os);
+      const otherMinor=os==='C'?'D':'C';
+      if(cnt[otherMinor]>=4 && hcp>=12) return sb(2,otherMinor);
+      return null;
+    }
+
+    // 1C-1D: natural one-level response.  1D opener has no 1D response.
+    if(opening==='1♣' && response==='1♦'){
+      if(cnt.H>=4) return sb(1,'H');
+      if(cnt.S>=4) return sb(1,'S');
+      if(balanced && hcp>=12&&hcp<=14) return sb(1,'NT');
+      if(cnt.C>=5) return sb(2,'C');
+      if(cnt.D>=4&&hcp>=12) return sb(2,'D');
+      return null;
+    }
+
+    // 2/1 response over a minor: opener shows natural second suit,
+    // 6-card minor, or strong NT shape.  No false jump-shifts on 18-19.
+    if(rl===2 && ['C','D','H','S'].includes(rs) && rs!==os){
+      if(balanced && hcp>=18&&hcp<=19) return sb(3,'NT');
+      if(hcp>=19){
+        if(rs!=='H'&&cnt.H>=4) return sb(3,'H');
+        if(rs!=='S'&&cnt.S>=4) return sb(3,'S');
+        const om=os==='C'?'D':'C';
+        if(rs!==om&&cnt[om]>=4) return sb(3,om);
+      }
+      if(cnt.H>=4 && rs!=='H') return sb(2,'H');
+      if(cnt.S>=4 && rs!=='S') return sb(2,'S');
+      if(cnt[os]>=6) return sb(3,os);
+      const om=os==='C'?'D':'C';
+      if(cnt[om]>=4 && hcp>=12) return sb(2,om);
+      if(balanced&&hcp>=12&&hcp<=14) return sb(2,'NT');
+      return null;
+    }
+
+    // Simple minor raise.
+    if(rs===os && rl===2){
+      if(hcp>=17) return sb(3,os); // invitational/stronger
+      return {bid:'PASS'};
+    }
+    if(rs===os && rl===3){
+      if(hcp>=15) return sb(5,os);
+      if(hcp>=12) return sb(3,'NT');
+      return {bid:'PASS'};
+    }
+  }
+
+  // ---------- RESPONDER: second bid after opener rebid ----------
+  if(seat===responder && a.length===3){
+    const r2=bid(1), oreb=bid(2), r2s=suit(1), oS=suit(2), oL=lvl(2);
+    // Major fit after opener raises responder's major.
+    if((r2s==='H'||r2s==='S') && oS===r2s){
+      if(hcp>=13) return sb(4,r2s);
+      if(hcp>=10) return sb(3,r2s);
+      return {bid:'PASS'};
+    }
+    // 1m-1M-1NT: responder rebids 5+ major naturally or invites/game in NT.
+    if(r2s && (r2s==='H'||r2s==='S') && oS==='NT' && oL===1){
+      if(cnt[r2s]>=6 && hcp>=8) return sb(4,r2s);
+      if(cnt[r2s]>=5 && hcp>=10) return sb(2,r2s);
+      if(hcp>=11) return sb(2,'NT');
+      return {bid:'PASS'};
+    }
+    // 1m-1M-2m: preference/raise; 3m is invitational, 5m is rare and not automatic.
+    if(oS===os && oL===2){
+      if(cnt[os]>=5 && hcp>=11) return sb(3,os);
+      if(cnt[os]>=5) return sb(2,os);
+      if(cnt[r2s]>=5 && hcp>=10) return sb(2,r2s);
+      return {bid:'PASS'};
+    }
+    // Opener showed a new suit.  4th suit forcing when responder bids the fourth suit.
+    if(oS && oS!=='NT' && r2s!==oS){
+      const known=new Set([os,r2s,oS]);
+      const fourth=['C','D','H','S'].find(x=>!known.has(x));
+      if(fourth && cnt[fourth]>=4 && hcp>=10) return sb(2,fourth);
+      // support opener's second suit
+      if((oS==='H'||oS==='S') && cnt[oS]>=3){
+        if(hcp>=12) return sb(4,suit(2));
+        if(hcp>=10) return sb(3,suit(2));
+        return sb(2,oS);
+      }
+      if(cnt[r2s]>=5 && hcp>=10) return sb(3,r2s);
+      if(hcp>=12 && balanced) return sb(2,'NT');
+      return {bid:'PASS'};
+    }
+    // 1m-1M-2NT: invite/game.
+    if(suit(2)==='NT'&&lvl(2)===2){
+      if(hcp>=9) return sb(3,'NT');
+      if(cnt[r2s]>=5&&hcp>=8) return sb(3,r2s);
+      return {bid:'PASS'};
+    }
+    // 2/1 response: continue; new 3-level suit is GF, 3NT game.
+    if(lvl(1)===2){
+      if(suit(2)==='NT'&&lvl(2)===3) return {bid:'PASS'};
+      if((oS==='H'||oS==='S') && cnt[oS]>=3){
+        if(hcp>=12) return sb(4,oS);
+        return sb(3,oS);
+      }
+      if(cnt[r2s]>=5 && hcp>=11) return sb(3,r2s);
+      if(hcp>=12 && balanced) return sb(3,'NT');
+      if(cnt[r2s]>=5) return sb(2,r2s);
+      return sb(2,'NT')||{bid:'PASS'};
+    }
+  }
+
+  // ---------- 3rd/4th rounds ----------
+  // Exact minor auction continuations that must not fall through to the generic engine.
+  if(a.length===4 && seat===opener && a[0].seat===seat &&
+     (a[0].bid==='1♣'||a[0].bid==='1♦') && (a[1].bid==='1♥'||a[1].bid==='1♠') &&
+     a[2].bid==='1NT' && a[3].bid===a[1].bid){
+    const fs=suitOf(a[1].bid);
+    if(cnt[fs]>=3 && hcp>=16) return sb(4,fs);
+    if(cnt[fs]>=3 && hcp>=13) return sb(3,fs);
+    if(balanced && hcp>=18) return sb(2,'NT');
+    return {bid:'PASS'};
+  }
+
+  if(a.length>=4){
+    // 1m-1M-1NT-2M: responder's natural second bid. Opener may pass,
+    // raise with three-card support, or bid 2NT with extras; do not fall
+    // through to the generic engine.
+    if((bid(0)==='1♣'||bid(0)==='1♦') && (bid(1)==='1♥'||bid(1)==='1♠') &&
+       bid(2)==='1NT' && bid(3)===bid(1) && seat===opener){
+      if(cnt[rs]>=3 && hcp>=16) return sb(4,rs);
+      if(cnt[rs]>=3 && hcp>=13) return sb(3,rs);
+      if(balanced && hcp>=18) return sb(2,'NT');
+      return {bid:'PASS'};
+    }
+
+    // 1m-1M-2M-... : responder's raise continuation.
+    if(seat===responder && (rs==='H'||rs==='S') && suit(2)===rs && lvl(2)===2){
+      if(hcp>=13) return sb(4,rs);
+      if(hcp>=10) return sb(3,rs);
+      return {bid:'PASS'};
+    }
+
+    // 1m-2X-2Y-2Z: responder's second bid after a 2/1; treat a genuine
+    // fourth suit as artificial and forcing, otherwise support or continue naturally.
+    if(seat===responder && lvl(1)===2 && lvl(2)===2){
+      const suitsSeen=[os,suit(1),suit(2)].filter(x=>x&&x!=='NT');
+      const fourth=['C','D','H','S'].find(x=>!suitsSeen.includes(x));
+      const current=suit(3), currentL=lvl(3);
+      if(currentL===2 && current===fourth && cnt[current]>=4) return sb(3,current)||sb(2,current);
+      if((suit(2)==='H'||suit(2)==='S')&&cnt[suit(2)]>=3){
+        if(hcp>=12) return sb(4,suit(2));
+        if(hcp>=10) return sb(3,suit(2));
+      }
+      if(hcp>=12&&balanced) return sb(3,'NT');
+    }
+
+    // Opener's answer to 4SF after a minor opening.
+    if(seat===opener && a.length===4 && lvl(3)===2){
+      const responderSuit=suit(1), second=suit(2), fs=suit(3);
+      const fourth=['C','D','H','S'].find(x=>![os,responderSuit,second].includes(x));
+      if(fourth===fs){
+        // After 1m-2X-2Y-2Z, Z is 4SF. First show support for Y (opener's second suit),
+        // then a stopper/NT description, then the long minor.
+        if(second&&second!=='NT'&&cnt[second]>=3) return sb(3,second);
+        if(isBalanced(cnt)&&cnt[fs]>=1&&hcp>=12) return sb(3,'NT');
+        if(second&&second!=='NT'&&cnt[second]>=5) return sb(3,second);
+        if(hcp>=13) return sb(3,'NT');
+      }
+    }
+  }
+  return null;
+}
+
 function getAIBid(seat){
+  activeAISeat=seat;
   const h=hands[seat], st=stats(h);
   const {hcp,cnt}=st;
   const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
@@ -919,13 +1700,51 @@ function getAIBid(seat){
     const bwCont=afterBlackwood(seat, agreed);
     if(bwCont) return bwCont;
   }
+  // ── 0A. COMPETITIVE PRIORITY — opponent intervention always wins
+  // over the uncontested opening-family cores. Otherwise a 1H/1S/minor
+  // core can swallow a negative double, takeout-double response or overcall.
+  const partnerXEarly=partnerMadeTakeout(seat);
+  const oppEarly=lastOppBid(seat);
+  if(oppActive){
+    const adv=aiAdvancedCompetitive(seat, st, oppEarly, partnerXEarly || pLast);
+    if(adv) cand=adv;
+    if(!cand) {
+      const sd=aiSupportDouble(seat, st, pLast, oppEarly);
+      if(sd) cand=sd;
+    }
+    if(cand) { /* advanced convention handled */ }
+    else if(partnerXEarly && myLast){
+      // Partner's negative double after our opening: opener must answer it
+      // before any uncontested opening-family core gets a chance to fire.
+      cand=aiAfterNegDouble(seat, st, myLast, oppEarly);
+    } else if(partnerXEarly && !myLast){
+      cand=aiResponseToTakeout(seat, st, oppEarly);
+    } else if(pLast && !myLast){
+      const olvl=lvlOf(oppEarly.bid);
+      cand=(olvl>=2 && olvl<=3) ? aiVsJumpOvercall(seat, st, oppEarly) : null;
+      if(!cand || cand.bid==='PASS') cand=aiResponseAfterOvercall(seat, st, pLast, oppEarly);
+    } else if(!myLast){
+      const olvl=lvlOf(oppEarly.bid);
+      cand=(olvl>=2 && olvl<=3) ? aiVsJumpOvercall(seat, st, oppEarly) : null;
+      if(!cand || cand.bid==='PASS') cand=aiOvercall(st, oppEarly);
+    }
+  }
+  // ── 0B. OPENING-FAMILY CORES — uncontested auction or later continuation
+  // Minor openings must be checked first because 1D/1C can be followed by 1H/1S.
+  if(!cand){
+    const minorCore = fiveMajorMinorCore(seat, st);
+    if(minorCore) return minorCore;
+    const heartCore=fiveMajorHeartCore(seat, st);
+    if(heartCore) return heartCore;
+  }
+
 
   // ── 1. OPENING (no prior real bid) ────────────────────────
-  if(!lastReal){
+  if(!cand && !lastReal){
     cand = aiOpen(st);
 
   // ── 2. FIRST RESPONSE ─────────────────────────────────────
-  } else if(!myLast){
+  } else if(!cand && !myLast){
     // Ben henüz hiç bid vermedim
     const opp=lastOppBid(seat);
     const ptd=partnerMadeTakeout(seat);
@@ -939,14 +1758,16 @@ function getAIBid(seat){
       // Normal ilk cevap
       cand = aiFirstResponse(st, pLast, false);
     } else if(oppActive){
-      // Sadece rakip konuştu → overcall veya takeout
-      cand = aiOvercall(st, lastReal);
+      // Sadece rakip konuştu → preempt/jump overcall, sonra natural overcall/double
+      const olvl=lvlOf(lastReal.bid);
+      if(olvl>=2 && lastReal.bid!=='2NT' && olvl<=3) cand=aiVsJumpOvercall(seat, st, lastReal);
+      if(!cand) cand = aiOvercall(st, lastReal);
     }
 
   // ── 5. OPENER REBID ────────────────────────────────────────
-  } else if(myLast && pLast && myBids.length===1 && pBids.length===1){
+  } else if(!cand && myLast && pLast && myBids.length===1 && pBids.length===1){
     // Partner negative double yaptı mı?
-    const partnerX=history.find(x=>x.seat===partner&&x.isX);
+    const partnerX=history.find(x=>x.seat===partner&&(x.isX||x.bid==='X'));
     const opp=lastOppBid(seat);
     if(partnerX && opp){
       cand = aiAfterNegDouble(seat, st, myLast, opp);
@@ -955,11 +1776,11 @@ function getAIBid(seat){
     }
 
   // ── 6. RESPONDER REBID ─────────────────────────────────────
-  } else if(myLast && pLast && myBids.length===1 && pBids.length>=2){
+  } else if(!cand && myLast && pLast && myBids.length===1 && pBids.length>=2){
     cand = aiResponderRebid(seat, st, myLast, pLast);
 
   // ── 7. LATER AUCTION ───────────────────────────────────────
-  } else if(myLast && pLast){
+  } else if(!cand && myLast && pLast){
     // Law of Total Tricks: rekabetçi devam
     const opp=lastOppBid(seat);
     if(opp && agreed){
@@ -1008,6 +1829,56 @@ function getAIBid(seat){
 }
 
 
+/* ── ADVANCED COMPETITIVE CONVENTIONS ──────────────────────── */
+function aiAdvancedCompetitive(seat, st, oppBid, pBid){
+  if(!oppBid) return null;
+  const {hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  const os=suitOf(oppBid.bid), ol=lvlOf(oppBid.bid);
+  if(!os) return null;
+
+  // Michaels cue-bid. Optional because it is not part of base SAYC.
+  if(conventionEnabled('michaels') && ol===1 && hcp>=8 && hcp<=16){
+    if(os==='C'||os==='D'){
+      const b=sb(2,os);
+      if(b && cnt.H>=4 && cnt.S>=4) return b; // both majors
+    } else if(os==='H' && cnt.S>=5){
+      const b=sb(2,'H'); if(b && cnt.S>=5 && Math.max(cnt.C,cnt.D)>=5) return b;
+    } else if(os==='S' && cnt.H>=5){
+      const b=sb(2,'S'); if(b && cnt.H>=5 && Math.max(cnt.C,cnt.D)>=5) return b;
+    }
+  }
+
+  // Unusual 2NT: optional, weak/competitive two-suited hand.
+  if(conventionEnabled('unusual2NT') && ol===1 && hcp>=7 && hcp<=11){
+    const lows = os==='S'||os==='H' ? ['C','D'] : ['D','C'];
+    const other=lows.every(x=>cnt[x]>=4);
+    if(other){ const b=sb(2,'NT'); if(b) return b; }
+  }
+
+  // Responsive double after partner's takeout double and RHO's suit bid.
+  if(conventionEnabled('responsiveDouble') && pBid && (pBid.isX||pBid.bid==='X') && hcp>=7){
+    const majors = (cnt.S>=3)+(cnt.H>=3);
+    const minors = (cnt.C>=3)+(cnt.D>=3);
+    if((os==='C'||os==='D') && majors>=1){ if(canDouble(seat)) return {bid:'X',isX:true}; }
+    if((os==='H'||os==='S') && majors>=1 && minors>=1){ if(canDouble(seat)) return {bid:'X',isX:true}; }
+  }
+
+  return null;
+}
+
+// Support double: optional convention, showing exactly 3-card support for
+// partner's major after a minor opening and an opponent's intervention.
+function aiSupportDouble(seat, st, pBid, oppBid){
+  if(!conventionEnabled('supportDouble') || !pBid || !oppBid) return null;
+  if(!(pBid.bid==='1♥'||pBid.bid==='1♠')) return null;
+  const ps=suitOf(pBid.bid), ol=lvlOf(oppBid.bid);
+  if(ol!==1) return null;
+  const myLast=history.filter(x=>x.seat===seat&&x.bid!=='PASS').slice(-1)[0];
+  if(!myLast || !['C','D'].includes(suitOf(myLast.bid))) return null;
+  if(cnt[ps]===3 && hcp>=10 && canDouble(seat)) return {bid:'X',isX:true};
+  return null;
+}
+
 /* ══════════════════════════════════════════════════════════════
    KOMPETİTİF DEKLERE SİSTEMİ
    1. Overcall\u2019dan sonra partner cevabı
@@ -1038,7 +1909,7 @@ function partnerFirstBid(seat){
 function partnerMadeTakeout(seat){
   const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
   // Partner X yaptı ve öncesinde rakip bid vardı
-  const px=history.find(x=>x.seat===partner&&x.isX);
+  const px=history.find(x=>x.seat===partner&&(x.isX||x.bid==='X'));
   if(!px) return null;
   // X\u2019ten önce rakip bid var mıydı?
   const pxIdx=history.indexOf(px);
@@ -1052,55 +1923,53 @@ function partnerMadeTakeout(seat){
 // Durum: partner 1x açtı, rakip overcall yaptı, biz cevap veriyoruz
 function aiResponseAfterOvercall(seat, st, pOpen, oppOvercall){
   if(!pOpen||!oppOvercall) return {bid:'PASS'};
-  const{hcp,cnt}=st;
-  const tot=aggrTotal(st);
-  const sb=(l,s)=>safeBid(l,s);
-  const pSuit=suitOf(pOpen.bid)||'C';
-  const pLvl=lvlOf(pOpen.bid)||1;
-  const oppSuit=suitOf(oppOvercall.bid)||'S';
-  const oppLvl=lvlOf(oppOvercall.bid)||1;
+  const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  const pSuit=suitOf(pOpen.bid), pLvl=lvlOf(pOpen.bid);
+  const oppSuit=suitOf(oppOvercall.bid), oppLvl=lvlOf(oppOvercall.bid);
+  if(!pSuit||!oppSuit) return {bid:'PASS'};
 
-  // ── NEGATIVE DOUBLE ──────────────────────────────────────
-  if(hcp>=8 && (oppLvl===1 || (oppLvl===2&&oppSuit==='S'))){
-    let negDbl=false;
-    if(oppSuit==='S' && cnt.H>=4) negDbl=true;
-    else if(oppSuit==='H' && cnt.S>=4) negDbl=true;
-    else if((oppSuit==='D'||oppSuit==='C') && (cnt.S>=4||cnt.H>=4)) negDbl=true;
-    if(negDbl && canDouble(seat)) return {bid:'X', isX:true};
+  // Negative double: show an unbid 4-card major (and 4/5 of the other
+  // major where appropriate). Keep it out of very weak hands.
+  if(hcp>=7 && canDouble(seat)){
+    let neg=false;
+    if(oppSuit==='S' && cnt.S>=4 && pSuit!=='S') neg=true;
+    else if(oppSuit==='H' && cnt.H>=4 && pSuit!=='H') neg=true;
+    else if((oppSuit==='C'||oppSuit==='D') && (cnt.S>=4||cnt.H>=4)) neg=true;
+    if(neg) return {bid:'X',isX:true};
   }
 
-  // ── CUE BID = güçlü fit (partner rengini destekliyoruz) ──
-  // Rakibin rengine cue bid = game force, partner rengi fitimiz var
-  if(pSuit && oppSuit && cnt[pSuit]>=3 && hcp>=13){
-    return sb(oppLvl+1, oppSuit)||{bid:'PASS'}; // cue bid
+  // Support partner's suit. Jump raise = invitational; direct game = strong.
+  if(cnt[pSuit]>=3){
+    // After an opponent overcall, partner's suit must be raised at the
+    // next legal level; rebidding the opening level is impossible.
+    if((pSuit==='S'||pSuit==='H') && hcp>=13){ const b=sb(4,pSuit); if(b) return b; }
+    if((pSuit==='S'||pSuit==='H') && cnt[pSuit]>=4 && hcp>=10){ const b=sb(3,pSuit); if(b) return b; }
+    if((pSuit==='S'||pSuit==='H') && hcp>=6){ const b=sb(2,pSuit); if(b) return b; }
+    if((pSuit==='D'||pSuit==='C') && hcp>=10){ const b=sb(3,pSuit); if(b) return b; }
+    if((pSuit==='D'||pSuit==='C') && hcp>=6){ const b=sb(2,pSuit); if(b) return b; }
   }
-  // Limit raise (overcall sonrası basit raise = zayıf, jump raise = invite)
-  if(pSuit&&(pSuit==='S'||pSuit==='H')){
-    if(cnt[pSuit]>=3&&hcp>=13) return sb(4,pSuit)||{bid:'PASS'}; // game
-    if(cnt[pSuit]>=4&&hcp>=10) return sb(3,pSuit)||{bid:'PASS'}; // limit raise
-    if(cnt[pSuit]>=3&&hcp>=6)  return sb(2,pSuit)||{bid:'PASS'}; // simple raise
-  }
-  if(pSuit&&(pSuit==='D'||pSuit==='C')){
-    if(cnt[pSuit]>=4&&hcp>=13) return sb(3,'NT')||{bid:'PASS'};
-    if(cnt[pSuit]>=4&&hcp>=10) return sb(3,pSuit)||{bid:'PASS'};
-    if(cnt[pSuit]>=4&&hcp>=7)  return sb(2,pSuit)||{bid:'PASS'};
-  }
-  // Yeni renk = forcing (overcall sonrası yeni renk gösterilebilir)
-  if(hcp>=10){
-    // 1 seviyesinde yeni majör
-    if(cnt.S>=5 && bval(1,'S')>lastBidVal&&suitOf(pOpen.bid)!=='S')
-      return sb(1,'S')||{bid:'PASS'};
-    if(cnt.H>=5 && bval(1,'H')>lastBidVal&&suitOf(pOpen.bid)!=='H')
-      return sb(1,'H')||{bid:'PASS'};
-  }
-  // NT cevapları (overcall sonrası NT = duruyorcu el)
-  if(hcp>=13&&isBalanced(cnt)) return sb(2,'NT')||{bid:'PASS'};
-  if(hcp>=10&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'};
-  if(hcp>=8&&isBalanced(cnt))  return sb(1,'NT')||{bid:'PASS'};
 
-  // Penalty double: çok güçlü el, rakip overcall düşebilir
-  if(hcp>=14 && canDouble(seat)) return {bid:'X', isX:true};
+  // New suit: forcing for one round. Prefer a 1-level bid when available;
+  // at the 2-level require 10+ HCP and 5+ cards.
+  if(hcp>=8){
+    for(const suit of ['S','H','D','C']){
+      if(suit===oppSuit||suit===pSuit) continue;
+      if(cnt[suit]>=5){
+        const one=sb(1,suit); if(one) return one;
+        if(hcp>=10){ const two=sb(2,suit); if(two) return two; }
+      }
+    }
+  }
 
+  // Cue bid of opponent's suit = limit raise or better in partner's suit.
+  if(cnt[pSuit]>=3 && hcp>=10){ const cb=sb(oppLvl+1,oppSuit); if(cb) return cb; }
+
+  // NT response with a stopper. 1NT = 6–10, 2NT = 10–12, 3NT = 13+.
+  if(cnt[oppSuit]>=1 && isBalanced(cnt)){
+    if(hcp>=13){ const b=sb(3,'NT'); if(b) return b; }
+    if(hcp>=10){ const b=sb(2,'NT'); if(b) return b; }
+    if(hcp>=6){ const b=sb(1,'NT'); if(b) return b; }
+  }
   return {bid:'PASS'};
 }
 
@@ -1108,46 +1977,40 @@ function aiResponseAfterOvercall(seat, st, pOpen, oppOvercall){
 // Durum: rakip 1x açtı, partner X (takeout) yaptı, biz cevap veriyoruz
 function aiResponseToTakeout(seat, st, oppBid){
   if(!oppBid) return {bid:'PASS'};
-  const{hcp,cnt}=st;
-  const sb=(l,s)=>safeBid(l,s);
-  const oppSuit=suitOf(oppBid.bid)||'S';
-  const oppLvl=lvlOf(oppBid.bid)||1;
+  const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  const oppSuit=suitOf(oppBid.bid), oppLvl=lvlOf(oppBid.bid);
+  if(!oppSuit) return {bid:'PASS'};
 
-  // Takeout double\u2019a MUTLAKA cevap verilmeli (pass yasak, rakip alttaysa)
-  // En uzun rengi veya en güçlü rengi söyle
-
-  // Cue bid = game force (12+ HCP) — rakibin rengi üstüne
-  if(hcp>=12 && oppSuit){
-    const cb=sb(oppLvl+1, oppSuit);
-    if(cb) return cb;
-    // Cue bid mümkün değilse NT
-    return sb(2,'NT')||sb(3,'NT')||{bid:'PASS'};
+  // Cue bid of opener's suit = strong hand / game forcing, normally asks
+  // partner to describe further.
+  if(hcp>=13){
+    const cb=sb(oppLvl+1,oppSuit); if(cb) return cb;
   }
 
-  // Jump cevap = invite (9-11 HCP)
+  // Balanced NT responses with stopper are preferable to a poor 4-card suit.
+  if(isBalanced(cnt) && cnt[oppSuit]>=1){
+    if(hcp>=10){ const b=sb(2,'NT'); if(b) return b; }
+    if(hcp>=6){ const b=sb(1,'NT'); if(b) return b; }
+  }
+
+  // Jump response = invitational (9–11 HCP). Choose longest available
+  // unbid suit; jump only when legal.
   if(hcp>=9){
-    if(cnt.S>=4&&oppSuit!=='S') return sb(2,'S')||{bid:'PASS'}; // jump
-    if(cnt.H>=4&&oppSuit!=='H') return sb(2,'H')||{bid:'PASS'};
-    if(cnt.D>=4&&oppSuit!=='D') return sb(2,'D')||{bid:'PASS'};
-    if(cnt.C>=4&&oppSuit!=='C') return sb(2,'C')||{bid:'PASS'};
-    return sb(1,'NT')||{bid:'PASS'};
+    const suits=['S','H','D','C'].filter(x=>x!==oppSuit).sort((a,b)=>cnt[b]-cnt[a]);
+    for(const suit of suits){
+      if(cnt[suit]>=4){
+        const b=sb(2,suit); if(b) return b;
+        const j=sb(3,suit); if(j) return j;
+      }
+    }
   }
 
-  // Minimum cevap (0-8 HCP) — en iyi renge en düşük seviyede
-  // Tercih: majör > minör
-  const choices=[];
-  if(cnt.S>=4&&oppSuit!=='S') choices.push(['S',cnt.S]);
-  if(cnt.H>=4&&oppSuit!=='H') choices.push(['H',cnt.H]);
-  if(cnt.D>=3&&oppSuit!=='D') choices.push(['D',cnt.D]);
-  if(cnt.C>=3&&oppSuit!=='C') choices.push(['C',cnt.C]);
-  choices.sort((a,b)=>b[1]-a[1]); // uzun olana göre sırala
-
-  for(const [suit] of choices){
-    const b=sb(1,suit)||sb(2,suit);
-    if(b) return b;
+  // Minimum response: lowest legal level in the longest unbid suit.
+  const suits=['S','H','D','C'].filter(x=>x!==oppSuit).sort((a,b)=>cnt[b]-cnt[a]);
+  for(const suit of suits){
+    if(cnt[suit]>=4){ const b=sb(1,suit)||sb(2,suit); if(b) return b; }
   }
-  // Hiçbir renk yoksa NT
-  return sb(1,'NT')||{bid:'PASS'};
+  return {bid:'PASS'};
 }
 
 // ── 3. NEGATIVE DOUBLE SONRASI OPENER REBID ───────────────────
@@ -1209,18 +2072,24 @@ function lawOfTotalTricks(seat, st, fitSuit){
 // ── 5. JUMP OVERCALL'A CEVAP ──────────────────────────────────
 // Rakip 2 seviyede atlayarak overcall yaptı (preemptive)
 function aiVsJumpOvercall(seat, st, oppBid){
-  const{hcp,cnt}=st;
-  const sb=(l,s)=>safeBid(l,s);
-  const oppLvl=lvlOf(oppBid.bid);
-
-  // Güçlü ellerle rekabet et
-  if(hcp>=13){
-    // Takeout double
-    if(!history.some(x=>x.seat===seat&&(x.isX||x.isXX)))
-      return {bid:'X',isX:true};
+  const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
+  if(!oppBid) return {bid:'PASS'};
+  const lvl=lvlOf(oppBid.bid), suit=suitOf(oppBid.bid);
+  if(lvl<2) return {bid:'PASS'};
+  // Strong balanced hand with a stopper: 2NT over a 2-level preempt.
+  if(lvl===2 && hcp>=16 && hcp<=18 && isBalanced(cnt) && suit && cnt[suit]>=1){
+    const b=sb(2,'NT'); if(b) return b;
   }
-  if(hcp>=17&&isBalanced(cnt)) return sb(2,'NT')||sb(3,'NT')||{bid:'PASS'};
-  // Partner rengine destek
+  // Takeout double: 13+ with shortness and support for the unbid suits.
+  if(canDouble(seat) && hcp>=13 && suit){
+    const short=cnt[suit]<=2;
+    const support=['S','H','D','C'].filter(x=>x!==suit&&cnt[x]>=3).length;
+    if(short&&support>=2) return {bid:'X',isX:true};
+  }
+  // Natural suit at the cheapest legal level with 5+ and 13+ values.
+  for(const x of ['S','H','D','C']){
+    if(x!==suit&&cnt[x]>=5&&hcp>=13){ const b=sb(lvl+1,x); if(b) return b; }
+  }
   return {bid:'PASS'};
 }
 
@@ -1482,17 +2351,22 @@ function aiFirstResponse(st, pLast, oppActive){
     if(cnt[psk]>=3&&hcp>=5)  return sb(plvl+1,psk)||{bid:'PASS'};
     return{bid:'PASS'};
   }
-  // Response to 1♠ — aggressive: use tot for fit raises
+  // Response to 1♠ — Standard American / SAYC core
   if(psym===SUITS.S.sym){
-    const fitTot=aggrTotal(st,cnt.S+5); // assume partner has 5
-    if(cnt.S>=5&&hcp>=14) return sb(4,'S')||{bid:'PASS'}; // splinter/direct
-    if(cnt.S>=4&&hcp>=12) return sb(3,'S')||{bid:'PASS'}; // limit raise, was 13
-    if(cnt.S>=4&&tot>=20) return sb(4,'S')||{bid:'PASS'}; // distributional game
-    if(cnt.S>=3&&hcp>=5)  return sb(2,'S')||{bid:'PASS'}; // was 6
-    if(cnt.H>=4&&hcp>=8)  return sb(2,'H')||{bid:'PASS'}; // 2/1, was 10
-    if(cnt.D>=4&&hcp>=8)  return sb(2,'D')||{bid:'PASS'};
-    if(cnt.C>=4&&hcp>=8)  return sb(2,'C')||{bid:'PASS'};
-    if(hcp>=5)            return sb(1,'NT')||{bid:'PASS'}; // was 6
+    // 1♠-4♠: preemptive/game sign-off with 5+ spades and limited values.
+    // This must be checked BEFORE 2♠, otherwise the 4♠ branch is unreachable.
+    if(cnt.S>=5&&hcp>=5&&hcp<=9) return sb(4,'S')||{bid:'PASS'};
+    // 1♠-3♠: limit raise, roughly 10-12 HCP and 4+ spades
+    if(cnt.S>=4&&hcp>=10&&hcp<=12) return sb(3,'S')||{bid:'PASS'};
+    // 1♠-2♠: simple raise, roughly 6-9 HCP and 3+ spades
+    if(cnt.S>=3&&hcp>=6&&hcp<=9) return sb(2,'S')||{bid:'PASS'};
+    // 2/1 response: 10+ HCP, 5+ suit. Prefer hearts over minors when both are available.
+    if(cnt.H>=5&&hcp>=10) return sb(2,'H')||{bid:'PASS'};
+    if(cnt.D>=5&&hcp>=10) return sb(2,'D')||{bid:'PASS'};
+    if(cnt.C>=5&&hcp>=10) return sb(2,'C')||{bid:'PASS'};
+    // 1NT response: 6-9 HCP, no suitable 3-card spade raise.
+    if(hcp>=6&&hcp<=9) return sb(1,'NT')||{bid:'PASS'};
+    // 1♠-2NT is not treated as Jacoby in this first V2 pass; avoid inventing a convention.
     return{bid:'PASS'};
   }
   // Response to 1♥
@@ -1545,18 +2419,51 @@ function aiCompetitiveOver1NT(st, pLast, oppBid){
 /* ── OVERCALL ────────────────────────────────────────────── */
 function aiOvercall(st, lastOppBid){
   const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
-  if(hcp>=10){
-    if(cnt.S>=5) return sb(1,'S')||sb(2,'S')||{bid:'PASS'};
-    if(cnt.H>=5) return sb(1,'H')||sb(2,'H')||{bid:'PASS'};
-    if(cnt.D>=5) return sb(1,'D')||sb(2,'D')||{bid:'PASS'};
-    if(cnt.C>=5) return sb(2,'C')||{bid:'PASS'};
-    if(hcp>=16&&isBalanced(cnt)) return sb(1,'NT')||{bid:'PASS'};
+  if(!lastOppBid) return {bid:'PASS'};
+  const oppSuit=suitOf(lastOppBid.bid), oppLvl=lvlOf(lastOppBid.bid);
+  const stop=oppSuit&&cnt[oppSuit]>=1;
+
+  // 1NT overcall: 15–18 balanced with a stopper in opener's suit.
+  if(oppLvl===1 && hcp>=15 && hcp<=18 && isBalanced(cnt) && stop){
+    const b=sb(1,'NT'); if(b) return b;
   }
-  return{bid:'PASS'};
+
+  // Takeout double: 12+ HCP, shortness in opener's suit and at least
+  // three-card support for the other suits. Avoid double with a long
+  // natural suit that is better shown as an overcall.
+  if(canDouble(activeAISeat) && hcp>=12 && oppSuit){
+    const short=cnt[oppSuit]<=2;
+    const maxOther=Math.max(...['S','H','D','C'].filter(x=>x!==oppSuit).map(x=>cnt[x]));
+    const supportOther=['S','H','D','C'].filter(x=>x!==oppSuit).filter(x=>cnt[x]>=3).length;
+    if(short && supportOther>=2 && !(maxOther>=6 && hcp<15)) return {bid:'X',isX:true};
+  }
+
+  // Natural overcalls. 1-level: 8–17 HCP, normally 5+ cards and a
+  // playable suit. 2-level: 10–17 HCP and normally 5+ cards (6+ clubs
+  // is preferred at the 2-level because 2C is otherwise a strong opening
+  // bid only when we are the opener).
+  const order=['S','H','D','C'];
+  if(oppLvl===1){
+    for(const suit of order){
+      if(cnt[suit]>=5 && hcp>=8 && hcp<=17){
+        const b=sb(1,suit); if(b) return b;
+      }
+    }
+  } else if(oppLvl===2){
+    for(const suit of order){
+      if(cnt[suit]>=5 && hcp>=10 && hcp<=17){
+        const b=sb(2,suit); if(b) return b;
+      }
+    }
+  }
+  return {bid:'PASS'};
 }
 
 /* ── OPENER REBID — Zone-aware ──────────────────────────── */
 function aiOpenerRebid(seat, st, myLast, pLast){
+  const spadeCore=fiveMajorSpadeCore(seat, st);
+  if(spadeCore) return spadeCore;
+
   const{hcp,cnt}=st;
   const tot=aggrTotal(st);
   const sb=(l,s)=>safeBid(l,s);
@@ -1664,6 +2571,9 @@ function aiOpenerRebid(seat, st, myLast, pLast){
 
 /* ── RESPONDER REBID — Zone-aware + Transfer completions ── */
 function aiResponderRebid(seat, st, myLast, pLast){
+  const spadeCore=fiveMajorSpadeCore(seat, st);
+  if(spadeCore) return spadeCore;
+
   const{hcp,cnt}=st;
   const tot=aggrTotal(st);
   const sb=(l,s)=>safeBid(l,s);
@@ -1772,6 +2682,9 @@ function aiResponderRebid(seat, st, myLast, pLast){
    If no fit, look for 3NT or pass.
 ─────────────────────────────────────────────────────────── */
 function aiLaterAuction(seat, st, myLast, pLast, agreed){
+  const spadeCore=fiveMajorSpadeCore(seat, st);
+  if(spadeCore) return spadeCore;
+
   const{hcp,cnt}=st; const sb=(l,s)=>safeBid(l,s);
   const mySuit=suitOf(myLast.bid), myLvl=lvlOf(myLast.bid);
   const pSuit =suitOf(pLast.bid),  pLvl =lvlOf(pLast.bid);
@@ -2014,7 +2927,8 @@ function finish(){
   const nb=document.createElement('button');
   nb.style.cssText='flex:1;padding:11px;background:rgba(22,88,56,0.68);color:#e8c97a;border:1px solid rgba(201,168,76,0.38);border-radius:8px;font-family:Playfair Display,serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;';
   nb.textContent='✦ Sonraki El ✦';
-  nb.onclick=function(){startGame();};
+  nb.onclick=function(){setAIDifficulty(aiDifficulty);
+startGame();};
   bar.appendChild(nb);
   el('anl').parentNode.insertBefore(bar, el('anl').nextSibling);
 }
@@ -2026,39 +2940,65 @@ function advice(nsHcp,ewHcp,fitNS,fitEW,optNS,optEW){const l=[];const fsNS=SUITS
 
 
 /* ══════════════════════════════════════════════════════════════
-   BLACKWOOD — 4NT AS SORGUSU VE CEVAPLARI
+   SLAM CONVENTIONS — BLACKWOOD / RKCB 1430 / KING ASK
+   Default: Roman Key Card Blackwood 1430.
+   4NT is RKCB only when a trump suit has been established or
+   strongly implied. Otherwise 4NT remains quantitative.
 ══════════════════════════════════════════════════════════════ */
 
-// Returns number of aces in a hand
 function countAces(hand){ return hand.filter(c=>c.r==='A').length; }
+function countKings(hand){ return hand.filter(c=>c.r==='K').length; }
+function countKeyCards(hand, trump){
+  // 4 aces + trump king. If trump is not known, RKCB is not used.
+  let n=countAces(hand);
+  if(trump && hand.some(c=>c.s===trump && c.r==='K')) n++;
+  return n;
+}
 
-// Check if the auction contains a 4NT bid (Blackwood ask)
+// Find the trump suit associated with a particular 4NT bid.
+// We accept either explicit agreement (both partners bid the suit) or
+// a strong implied major fit (partner bid the major and asker has 4+).
+function rkcbSuitForEntry(entry){
+  if(!entry || entry.bid!=='4NT') return null;
+  const idx=history.indexOf(entry);
+  if(idx<0) return null;
+  const asker=entry.seat;
+  const partner=partnerOf(asker);
+  const before=history.slice(0,idx).filter(x=>x.bid!=='PASS'&&!x.isX&&!x.isXX);
+  const askerSuits=before.filter(x=>x.seat===asker).map(x=>suitOf(x.bid)).filter(s=>s&&s!=='NT');
+  const partnerSuits=before.filter(x=>x.seat===partner).map(x=>suitOf(x.bid)).filter(s=>s&&s!=='NT');
+
+  // Explicit agreement: both partners have bid the same suit.
+  for(const su of partnerSuits){ if(askerSuits.includes(su)) return su; }
+
+  // Implied major fit: partner has shown a major and asker has 4+ cards.
+  const h=hands[asker]||[];
+  for(const su of ['S','H']){
+    if(partnerSuits.includes(su) && h.filter(c=>c.s===su).length>=4) return su;
+  }
+  return null;
+}
+
+function isRKCB4NT(entry){ return !!rkcbSuitForEntry(entry); }
+
 function lastBlackwood(){
-  // Find the most recent 4NT bid that is not a quantitative NT
   for(let i=history.length-1;i>=0;i--){
     const e=history[i];
-    if(e.bid==='4NT') return e;
+    if(e.bid==='4NT' && isRKCB4NT(e)) return e;
   }
   return null;
 }
 
-// Check if a 5NT bid was asked (King ask after Blackwood)
 function lastFiveNT(){
-  const bw=lastBlackwood();
-  if(!bw) return null;
+  const bw=lastBlackwood(); if(!bw) return null;
   const idx=history.indexOf(bw);
-  for(let i=idx+1;i<history.length;i++){
-    if(history[i].bid==='5NT') return history[i];
-  }
+  for(let i=idx+1;i<history.length;i++) if(history[i].bid==='5NT') return history[i];
   return null;
 }
 
-// Has 4NT been answered already?
 function blackwoodAnswered(){
-  const bw=lastBlackwood();
-  if(!bw) return false;
+  const bw=lastBlackwood(); if(!bw) return false;
   const idx=history.indexOf(bw);
-  // Look for a 5-level bid after 4NT
   for(let i=idx+1;i<history.length;i++){
     const b=history[i];
     if(b.bid!=='PASS'&&!b.isX&&!b.isXX){
@@ -2069,109 +3009,115 @@ function blackwoodAnswered(){
   return false;
 }
 
-// Is it this seat\u2019s turn to ANSWER Blackwood?
 function mustAnswerBlackwood(seat){
-  const bw=lastBlackwood();
-  if(!bw) return false;
-  if(blackwoodAnswered()) return false;
-  // The partner of the Blackwood asker must answer
-  const asker=bw.seat;
-  const partner=asker==='N'?'S':asker==='S'?'N':asker==='E'?'W':'E';
-  return seat===partner;
+  const bw=lastBlackwood(); if(!bw || blackwoodAnswered()) return false;
+  return seat===partnerOf(bw.seat);
 }
 
-// Is it this seat\u2019s turn to ANSWER 5NT (king ask)?
 function mustAnswerFiveNT(seat){
-  const fn=lastFiveNT();
-  if(!fn) return false;
-  const asker=fn.seat;
-  const partner=asker==='N'?'S':asker==='S'?'N':asker==='E'?'W':'E';
-  // Check not already answered
+  const fn=lastFiveNT(); if(!fn) return false;
   const idx=history.indexOf(fn);
   for(let i=idx+1;i<history.length;i++){
     const b=history[i];
-    if(b.bid!=='PASS'&&!b.isX&&!b.isXX) return false; // already answered
+    if(b.bid!=='PASS'&&!b.isX&&!b.isXX) return false;
   }
-  return seat===partner;
+  return seat===partnerOf(fn.seat);
 }
 
-// Standard Blackwood response: 5♣=0/4, 5♦=1, 5♥=2, 5♠=3
+// RKCB 1430:
+// 5C = 1 or 4 key cards
+// 5D = 0 or 3 key cards
+// 5H = 2 key cards, trump Q absent
+// 5S = 2 key cards, trump Q present
 function blackwoodResponse(seat){
-  const aces=countAces(hands[seat]);
-  const responses={0:'C', 1:'D', 2:'H', 3:'S', 4:'C'};
-  const suitKey=responses[aces]||'C';
-  return safeBid(5,suitKey)||{bid:'PASS'};
+  const bw=lastBlackwood();
+  const trump=bw ? rkcbSuitForEntry(bw) : null;
+  if(!trump) return {bid:'PASS'};
+  const keys=countKeyCards(hands[seat],trump);
+  const q=hands[seat].some(c=>c.s===trump&&c.r==='Q');
+  const response = keys===1||keys===4 ? 'C' : keys===0||keys===3 ? 'D' : q ? 'S' : 'H';
+  return safeBid(5,response)||{bid:'PASS'};
 }
 
-// 5NT response (king ask): 6♣=0k, 6♦=1k, 6♥=2k, 6♠=3k, 6NT=4k
+// 5NT after RKCB asks for specific side-suit kings.
+// The trump king is already a key card and is therefore excluded.
 function fiveNTResponse(seat){
-  const kings=hands[seat].filter(c=>c.r==='K').length;
-  const responses={0:'C', 1:'D', 2:'H', 3:'S', 4:'NT'};
-  const suitKey=responses[kings]||'C';
-  return safeBid(6,suitKey)||{bid:'PASS'};
+  const bw=lastBlackwood();
+  const trump=bw ? rkcbSuitForEntry(bw) : null;
+  if(!trump) return {bid:'PASS'};
+
+  // Specific King Ask (SKA): show the cheapest non-trump King held.
+  // The trump King is already one of the five Key Cards and is never shown again.
+  const kingOrder=['C','D','H','S'];
+  for(const su of kingOrder){
+    if(su!==trump && hands[seat].some(c=>c.s===su&&c.r==='K')){
+      return safeBid(6,su)||{bid:'PASS'};
+    }
+  }
+  // No side-suit King: return to 6 of the agreed trump.
+  return safeBid(6,trump)||{bid:'PASS'};
 }
 
-// Should this seat ASK Blackwood?
-// Conditions: fit confirmed, slam range HCP (≥31 combined estimate), no 4NT yet
 function shouldAsk4NT(seat, st, agreed){
-  if(lastBlackwood()) return false; // already asked
-  if(!agreed || agreed==='NT') return false; // need fit
-  const partner=seat==='N'?'S':seat==='S'?'N':seat==='E'?'W':'E';
-  const pSt=stats(hands[partner]);
-  // Estimate combined: if we\u2019re slam-inviting, assume partner has 12-14
-  // Be conservative: only ask if we personally have 18+ and fit is known
-  if(st.hcp<16) return false; // aggressive: ask Blackwood earlier
-  if(lastBidVal>=bval(4,agreed)) return false; // too high already
+  if(lastBlackwood()) return false;
+  if(!agreed || agreed==='NT') return false;
+  if(st.hcp<16) return false;
+  if(lastBidVal>=bval(4,agreed)) return false;
   return true;
 }
 
-// After Blackwood response: decide final contract
+function rkcbResponseInfo(responseBid){
+  const s=suitOf(responseBid);
+  if(s==='C') return {min:1,max:4,ambiguous:true};
+  if(s==='D') return {min:0,max:3,ambiguous:true};
+  if(s==='H') return {min:2,max:2,queen:false};
+  if(s==='S') return {min:2,max:2,queen:true};
+  return null;
+}
+
+// After RKCB response, continue the auction conservatively.
+// 5NT is used as the king/clarification ask when the key-card count
+// is ambiguous and the asker has enough key cards to make clarification useful.
 function afterBlackwood(seat, agreed){
-  const bw=lastBlackwood();
-  if(!bw) return null;
+  const bw=lastBlackwood(); if(!bw) return null;
+  const trump=rkcbSuitForEntry(bw); if(!trump) return null;
   const bwIdx=history.indexOf(bw);
-  // Find the response (5-level bid by partner)
   let responseEntry=null;
   for(let i=bwIdx+1;i<history.length;i++){
     const b=history[i];
-    if(b.bid!=='PASS'&&!b.isX&&!b.isXX&&parseInt(b.bid[0])===5){
-      responseEntry=b; break;
-    }
+    if(b.bid!=='PASS'&&!b.isX&&!b.isXX&&parseInt(b.bid[0])===5){ responseEntry=b; break; }
   }
   if(!responseEntry) return null;
-  
-  const responseSuit=suitOf(responseEntry.bid);
-  const acesMap={C:0,D:1,H:2,S:3}; // 4♣=0or4
-  let partnerAces=acesMap[responseSuit]??0;
-  const myAces=countAces(hands[seat]);
-  const totalAces=myAces+partnerAces;
+
+  const info=rkcbResponseInfo(responseEntry.bid);
+  const myHand=hands[seat]||[];
+  const myKeys=countKeyCards(myHand,trump);
+  const myAces=countAces(myHand);
+  const myKeyTotalMin=myKeys+(info?info.min:0);
+  const myKeyTotalMax=myKeys+(info?info.max:0);
   const sb=(l,s)=>safeBid(l,s);
-  const fs=agreed||'NT';
 
-  // If response was 5♣, ambiguous (0 or 4) — ask 5NT to clarify
-  if(responseSuit==='C' && myAces>=2){
-    return sb(5,'NT')||{bid:'PASS'}; // ask king count / clarify
+  // 5NT is a Specific King Ask (SKA), not a generic clarification ask.
+  // It is only valid when the partnership is known to hold all five Key Cards
+  // and the trump Queen (or an equivalent confirmed control) and therefore has
+  // a genuine grand-slam interest. Do not use it merely to resolve 5C/5D ambiguity.
+  const trumpQ=myHand.some(c=>c.s===trump&&c.r==='Q');
+  const guaranteedFive = info && !info.ambiguous && (myKeyTotalMin===5 || myKeyTotalMax===5)
+    ? (myKeyTotalMin===5 && myKeyTotalMax===5) : false;
+  if(guaranteedFive && trumpQ){
+    return sb(5,'NT')||null;
   }
 
-  // Decide slam level based on aces
-  if(totalAces>=4){
-    // All aces — grand slam if HCP allows
-    if(st.hcp>=17 && fs!=='NT') return sb(7,fs)||sb(7,'NT')||{bid:'PASS'};
-    if(fs!=='NT') return sb(6,fs)||{bid:'PASS'};
-    return sb(6,'NT')||{bid:'PASS'};
-  }
-  if(totalAces===3){
-    if(fs!=='NT') return sb(6,fs)||{bid:'PASS'};
-    return sb(6,'NT')||{bid:'PASS'};
-  }
-  if(totalAces===2){
-    // Missing 2 aces — sign off at 5
-    if(fs!=='NT') return sb(5,fs)||{bid:'PASS'};
-    return sb(4,'NT')||{bid:'PASS'};
-  }
-  // Missing 3+ aces — sign off
-  if(fs!=='NT') return sb(5,fs)||{bid:'PASS'};
-  return{bid:'PASS'};
+  // For 5C/5D ambiguity, prefer the agreed suit or a conservative slam decision;
+  // do not turn 5NT into a second Key Card ask.
+
+  // 2+ key cards plus a known queen / 3+ total keys: small slam is reasonable.
+  if(myKeyTotalMin>=5) return sb(7,trump)||{bid:'PASS'};
+  if(myKeyTotalMin>=4) return sb(6,trump)||{bid:'PASS'};
+
+  // If only 3 total key cards are known, stop at five of the trump.
+  if(myKeyTotalMax>=3) return sb(5,trump)||{bid:'PASS'};
+  return {bid:'PASS'};
 }
 
 /* ════════════════════════════════════════════════════
@@ -2236,7 +3182,7 @@ function startPlay(){
   defR=order[(di+3)%4]; // diğer savunmacı
 
   currentTrick=[];currentTrickSeat=defL;
-  tricksDeclarer=0;tricksDefenders=0;trickCount=0;ledSuit=null;
+  tricksDeclarer=0;tricksDefenders=0;trickCount=0;ledSuit=null;playHistory=[];
   playHands={};Object.keys(hands).forEach(p=>{playHands[p]=hands[p].map(c=>({...c}));});
   playActive=true;
 
@@ -2465,6 +3411,7 @@ function playCard(seat,card){
   playHands[seat].splice(idx,1);
   if(currentTrick.length===0)ledSuit=card.s;
   currentTrick.push({seat,card});
+  playHistory.push({trick:trickCount+1,seat,card:{...card}});
   const order=['N','E','S','W'];
   currentTrickSeat=order[(order.indexOf(seat)+1)%4];
   renderPlay();
@@ -2651,12 +3598,380 @@ function ddGetBestMove(seat){
   }
 }
 
-function chooseCard(seat,h){
-  // ── ÖNCE KESİN ÇÖZÜM DENE (double-dummy solver) ────────────
-  const exact=ddGetBestMove(seat);
-  if(exact) return exact;
+function suitPlayedCount(suit){
+  return playHistory.reduce((n,e)=>n+(e.card.s===suit?1:0),0);
+}
+function partnerRemainingCount(partner,suit){
+  return (playHands[partner]||[]).filter(c=>c.s===suit).length;
+}
+function previousTrick(){
+  if(trickCount===0) return [];
+  const arr=playHistory.filter(e=>e.trick===trickCount);
+  return arr.length===4?arr:[];
+}
+function previousTrickWinner(trick){
+  if(!trick.length) return null;
+  return trickWinner(trick.map(e=>({seat:e.seat,card:e.card})));
+}
+function chooseSubsequentDefenderLead(seat,legal){
+  if(!legal.length) return null;
+  const partner=seat===defL?defR:defL;
+  const prev=previousTrick();
+  const prevWinner=previousTrickWinner(prev);
+  const nonTrump=trump?legal.filter(c=>c.s!==trump):legal.slice();
+  const pool=nonTrump.length?nonTrump:legal.slice();
 
-  // ── Bulunamadıysa (çok erken el veya bütçe aşımı) sezgisel devam ──
+  // First priority: return partner's suit when partner won the previous trick.
+  // This is a conservative standard-defence heuristic, not a convention claim.
+  if(prevWinner===partner){
+    const winnerCard=prev.find(e=>e.seat===partner)?.card;
+    if(winnerCard){
+      const back=pool.filter(c=>c.s===winnerCard.s);
+      if(back.length){
+        const seq=back.slice().sort((a,b)=>RV2(b.r)-RV2(a.r));
+        if(seq.length>=2 && RV2(seq[0].r)-RV2(seq[1].r)<=2) return seq[0];
+        if(seq.length>=4) return seq[seq.length-4]||seq[seq.length-1];
+        return seq[seq.length-1];
+      }
+    }
+  }
+
+  // Second priority: lead the suit in which partner has the most known
+  // remaining cards, avoiding trump. This uses actual card information,
+  // not an invented signal convention.
+  const scored=pool.map(c=>({c,n:partnerRemainingCount(partner,c.s),mine:playHands[seat].filter(x=>x.s===c.s).length}));
+  scored.sort((a,b)=>b.n-a.n || b.mine-a.mine || RV2(a.c.r)-RV2(b.c.r));
+  if(scored.length){
+    const s=scored[0].c.s;
+    const cards=pool.filter(c=>c.s===s).sort((a,b)=>RV2(b.r)-RV2(a.r));
+    if(cards.length>=4) return cards[cards.length-4]||cards[cards.length-1];
+    if(cards.length>=2 && RV2(cards[0].r)-RV2(cards[1].r)<=2) return cards[0];
+    return cards[cards.length-1];
+  }
+  return null;
+}
+function chooseDefensiveDiscard(seat,legal,partner){
+  const nonTrump=trump?legal.filter(c=>c.s!==trump):legal.slice();
+  if(!nonTrump.length) return legal.slice().sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+  const groups={};
+  nonTrump.forEach(c=>(groups[c.s]??=[]).push(c));
+  const candidates=[];
+  Object.entries(groups).forEach(([s,cards])=>{
+    const partnerCount=partnerRemainingCount(partner,s);
+    const honorPenalty=cards.filter(c=>['A','K','Q','J'].includes(c.r)).length;
+    candidates.push({s,cards,partnerCount,honorPenalty});
+  });
+  // Prefer a short, non-honor suit that partner is unlikely to need us to hold.
+  candidates.sort((a,b)=>a.cards.length-b.cards.length || a.honorPenalty-b.honorPenalty || a.partnerCount-b.partnerCount);
+  const chosen=candidates[0].cards.slice().sort((a,b)=>RV2(a.r)-RV2(b.r));
+  return chosen[0];
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   DECLARER PLAN 2.0 — contract goal + entries + trump + ruff plans
+   Conservative by design. It proposes a plan only when the first move
+   is sufficiently supported by the two visible hands. Otherwise the
+   existing card engine remains the fallback.
+══════════════════════════════════════════════════════════════ */
+function visibleDeclCards(){
+  const a=playHands[declarer]||[], b=playHands[dummy]||[];
+  return a.concat(b);
+}
+function suitCardsVisible(s){return visibleDeclCards().filter(c=>c.s===s);}
+function suitLengthVisible(s){return suitCardsVisible(s).length;}
+function handSuitCards(seat,s){return (playHands[seat]||[]).filter(c=>c.s===s).slice().sort((a,b)=>RV2(b.r)-RV2(a.r));}
+function contractTrumpCount(){return trump?visibleDeclCards().filter(c=>c.s===trump).length:0;}
+function visibleWinnersInSuit(s){
+  const cards=suitCardsVisible(s).slice().sort((a,b)=>RV2(b.r)-RV2(a.r));
+  if(!cards.length)return 0;
+  const vals=new Set(cards.map(c=>c.r)); let n=0;
+  if(vals.has('A')) n++;
+  if(vals.has('K')&&vals.has('A')) n++;
+  if(vals.has('Q')&&vals.has('A')&&vals.has('K')) n++;
+  if(vals.has('J')&&vals.has('A')&&vals.has('K')&&vals.has('Q')) n++;
+  return n;
+}
+function suitHasFinesseShape(s){
+  const cards=suitCardsVisible(s), vals=new Set(cards.map(c=>c.r));
+  if(cards.length<3)return false;
+  return (vals.has('A')&&vals.has('J')&&!vals.has('K')) ||
+         (vals.has('A')&&vals.has('Q')&&!vals.has('K')&&!vals.has('J')) ||
+         (vals.has('K')&&vals.has('Q')&&!vals.has('A'));
+}
+function declarerPlanState(){
+  const req=Math.max(0,contractLevel+6), need=Math.max(0,req-tricksDeclarer);
+  const side=[];
+  for(const s of SK){
+    const cards=suitCardsVisible(s); if(!cards.length)continue;
+    side.push({s,len:cards.length,winners:visibleWinnersInSuit(s),finesse:suitHasFinesseShape(s)});
+  }
+  const dt=trump?handSuitCards(declarer,trump).length:0, nt=trump?handSuitCards(dummy,trump).length:0;
+  return {req,need,side,trump,visibleCount:visibleDeclCards().length,declarerTrumps:dt,dummyTrumps:nt};
+}
+
+function declarerFindFinesse(seat,legal){
+  const other=seat===declarer?dummy:declarer;
+  for(const s of SK){
+    if(s===trump)continue;
+    const from=handSuitCards(seat,s), to=handSuitCards(other,s);
+    if(!from.length||!to.length)continue;
+    const f=new Set(from.map(c=>c.r)), o=new Set(to.map(c=>c.r));
+    // A finesse must be led FROM the hand without the target honor TOWARD
+    // the hand holding that honor.  The previous version reversed this
+    // relationship and could identify a finesse that was not executable.
+    const lowFrom=()=>legal.filter(c=>c.s===s && RV2(c.r)<RV2('Q'))
+      .sort((a,b)=>RV2(a.r)-RV2(b.r))[0]||null;
+    if(o.has('J') && !f.has('K') && !f.has('Q')){
+      const low=lowFrom();
+      if(low)return {type:'finesse',s,card:low,targetSeat:other,targetHonor:'J',confidence:0.92};
+    }
+    if(o.has('Q') && !f.has('K') && !f.has('A')){
+      const low=lowFrom();
+      if(low)return {type:'finesse',s,card:low,targetSeat:other,targetHonor:'Q',confidence:0.90};
+    }
+    // K toward Q/J is also a valid finesse candidate when the other hand
+    // contains the target honor and the lead can be made from this hand.
+    if(f.has('A') && o.has('Q') && !f.has('K')){
+      // If A is in the leading hand, a small card from that hand does NOT
+      // create the intended finesse; only consider it if the other hand has
+      // the lower honor and this hand can preserve A for later.
+      const low=legal.filter(c=>c.s===s && c.r!=='A' && RV2(c.r)<RV2('Q'))
+        .sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      if(low)return {type:'finesse',s,card:low,targetSeat:other,targetHonor:'Q',confidence:0.76};
+    }
+  }
+  return null;
+}
+
+function declarerFindEntry(seat,legal,targetSeat){
+  const other=targetSeat;
+  for(const s of SK){
+    const from=handSuitCards(seat,s), to=handSuitCards(other,s);
+    if(!from.length||!to.length)continue;
+    const targetTop=to[0];
+    // A practical entry requires a low card in the source hand and a visible
+    // established honor in the target hand.  Do not call a suit an entry
+    // merely because the target hand owns a Q while the source cannot reach it.
+    const established = ['A','K','Q'].includes(targetTop.r);
+    if(!established)continue;
+    const low=legal.filter(c=>c.s===s && RV2(c.r)<RV2(targetTop.r))
+      .sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+    if(low)return {type:'entry',s,card:low,target:targetSeat,targetCard:targetTop,targetHonor:targetTop.r,confidence:0.82};
+  }
+  return null;
+}
+function declarerFindSideWinner(seat,legal,plan){
+  if(plan.need<=0)return null;
+  const candidates=[];
+  for(const p of plan.side){
+    if(p.s===trump||p.winners<=0)continue;
+    const cards=legal.filter(c=>c.s===p.s).sort((a,b)=>RV2(b.r)-RV2(a.r));
+    if(!cards.length)continue;
+    if(cards[0].r==='A'||(cards[0].r==='K'&&cards.some(c=>c.r==='A')))
+      candidates.push({type:'winner',s:p.s,card:cards[0],confidence:0.88});
+  }
+  return candidates.sort((a,b)=>b.confidence-a.confidence)[0]||null;
+}
+
+function declarerFindCrossruff(seat,legal,plan){
+  if(!trump||plan.declarerTrumps<2||plan.dummyTrumps<2)return null;
+  const other=seat===declarer?dummy:declarer;
+  // A crossruff candidate exists when one hand is void in a side suit and the
+  // other has that suit plus trumps. Lead that side suit toward the void hand.
+  for(const s of SK){
+    if(s===trump)continue;
+    const mine=handSuitCards(seat,s), theirs=handSuitCards(other,s);
+    if(!mine.length&&!theirs.length)continue;
+    if(!mine.length && theirs.length){
+      // Need to be able to ruff in our hand; leading from the other hand.
+      const card=theirs.slice().sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      if(legal.some(c=>c.s===s))return {type:'crossruff',s,card,confidence:0.74};
+    }
+    if(mine.length && !theirs.length){
+      // Mirror case: the current hand can lead the side suit and the target
+      // hand is void, so the target hand can ruff.
+      const card=mine.slice().sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      if(legal.some(c=>c.s===s))return {type:'crossruff',s,card,confidence:0.74};
+    }
+  }
+  return null;
+}
+
+function declarerFindDummyReversal(seat,legal,plan){
+  if(!trump||plan.dummyTrumps<4||plan.declarerTrumps>2)return null;
+  const other=seat===declarer?dummy:declarer;
+  const cards=handSuitCards(seat,trump);
+  if(!cards.length)return null;
+  // Conservative trigger: use a side-suit winner/entry before drawing trump.
+  const entry=declarerFindEntry(seat,legal,other);
+  if(entry)return {type:'dummyReversal',s:entry.s,card:entry.card,confidence:0.7};
+  return null;
+}
+
+function declarerFindPromotion(seat,legal){
+  for(const s of SK){
+    if(s===trump)continue;
+    const cards=suitCardsVisible(s).slice().sort((a,b)=>RV2(b.r)-RV2(a.r));
+    if(cards.length<4)continue;
+    const vals=new Set(cards.map(c=>c.r));
+    if(vals.has('A')&&vals.has('K'))continue;
+    // A long suit with a missing top honor can be established later; only lead
+    // the lowest card when this hand actually has length and no immediate winner.
+    const local=legal.filter(c=>c.s===s).sort((a,b)=>RV2(a.r)-RV2(b.r));
+    if(local.length>=2)return {type:'promotion',s,card:local[0],confidence:0.62};
+  }
+  return null;
+}
+
+
+// ── MULTI-STEP DECLARER PLAN (V3.5.4) ─────────────────────────────
+// The planner is deliberately conservative: it creates a short sequence of
+// executable objectives rather than trying to solve the whole deal at once.
+// Each trick is re-evaluated, so the sequence can adapt when a finesse,
+// entry, ruff or winner has already been used.
+function declarerChainHistory(){
+  return (playHistory||[]).map(x=>({seat:x.seat,card:x.card||x})).filter(x=>x.card);
+}
+function declarerChainSuitPlayed(s, r, sourceSeat){
+  return declarerChainHistory().some(x=>x.card.s===s && (!r || x.card.r===r) && (!sourceSeat || x.seat===sourceSeat));
+}
+function declarerChainPlan(seat,legal){
+  if(!(seat===declarer||seat===dummy)||!legal.length)return null;
+  const plan=declarerPlanState();
+  if(plan.need<=0)return null;
+
+  // Keep the current tactical objective stable across tricks.  A plan is only
+  // advanced after its defining card has actually appeared in play history.
+  // This prevents the engine from abandoning a finesse/entry chain simply
+  // because another attractive candidate becomes visible on the next trick.
+  const hist=declarerChainHistory();
+  const f=declarerFindFinesse(seat,legal);
+  if(f){
+    const finessePlayed=hist.some(x=>x.card.s===f.s && x.seat===seat && RV2(x.card.r)<RV2(f.targetHonor));
+    if(!finessePlayed && legal.some(c=>c.s===f.card.s&&c.r===f.card.r)){
+      return Object.assign({},f,{step:'finesse',sequence:['finesse','entry','sideWinner','trumpControl']});
+    }
+  }
+
+  // After the finesse lead, look for an executable entry to the target hand.
+  // Prefer the suit that actually carried the finesse objective before using
+  // an unrelated entry.
+  const target=seat===declarer?dummy:declarer;
+  const finesseSuit=f && hist.some(x=>x.card.s===f.s && x.card.r===f.card.r) ? f.s : null;
+  const entries=[];
+  if(finesseSuit){
+    const from=handSuitCards(seat,finesseSuit), to=handSuitCards(target,finesseSuit);
+    const top=to.slice().sort((a,b)=>RV2(b.r)-RV2(a.r))[0];
+    if(top && ['A','K','Q'].includes(top.r)){
+      const low=legal.filter(c=>c.s===finesseSuit&&RV2(c.r)<RV2(top.r)).sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      if(low) entries.push({type:'entry',s:finesseSuit,card:low,target:target,targetCard:top,targetHonor:top.r,confidence:0.95});
+    }
+  }
+  const e=entries[0]||declarerFindEntry(seat,legal,target);
+  if(e){
+    return Object.assign({},e,{step:'entry',sequence:['entry','sideWinner','trumpControl']});
+  }
+
+  const w=declarerFindSideWinner(seat,legal,plan);
+  if(w && !declarerChainSuitPlayed(w.s,null,seat)){
+    return Object.assign({},w,{step:'sideWinner',sequence:['sideWinner','trumpControl']});
+  }
+
+  if(trump){
+    const tc=legal.filter(c=>c.s===trump);
+    const sideLive=plan.side.some(x=>x.s!==trump && (x.finesse || x.winners>0));
+    if(tc.length && !sideLive){
+      return {type:'trumpControl',s:trump,card:tc.slice().sort((a,b)=>RV2(b.r)-RV2(a.r))[0],
+        confidence:0.78,step:'trumpControl',sequence:['trumpControl']};
+    }
+  }
+  return null;
+}
+function chooseDeclarerChainCard(seat,legal){
+  const c=declarerChainPlan(seat,legal);
+  return c && legal.some(x=>x.s===c.card.s && x.r===c.card.r) ? c.card : null;
+}
+
+function declarerPlanCandidates(seat,legal){
+  const plan=declarerPlanState(), out=[];
+  const f=declarerFindFinesse(seat,legal); if(f)out.push(f);
+  const rev=declarerFindDummyReversal(seat,legal,plan); if(rev)out.push(rev);
+  const cr=declarerFindCrossruff(seat,legal,plan); if(cr)out.push(cr);
+  const e=declarerFindEntry(seat,legal,seat===declarer?dummy:declarer); if(e)out.push(e);
+  const w=declarerFindSideWinner(seat,legal,plan); if(w)out.push(w);
+  const p=declarerFindPromotion(seat,legal); if(p)out.push(p);
+  return out.sort((a,b)=>b.confidence-a.confidence);
+}
+
+function declarerHighConfidencePlan(seat,legal){
+  if(!(seat===declarer||seat===dummy)||!legal.length)return null;
+  const plan=declarerPlanState(); if(plan.need<=0)return null;
+  const c=declarerPlanCandidates(seat,legal)[0];
+  return c && c.confidence>=0.75 ? c : null;
+}
+
+function declarerPlanSuitPriority(){
+  const need=Math.max(0,(contractLevel+6)-tricksDeclarer), scores=[];
+  for(const s of SK){
+    const cards=suitCardsVisible(s); if(!cards.length)continue;
+    const winners=visibleWinnersInSuit(s), len=cards.length;
+    let score=winners*18+Math.min(len,5)*2;
+    if(len>=5)score+=8;
+    if(suitHasFinesseShape(s))score+=5;
+    if(trump&&s===trump)score-=6;
+    if(need>=3&&len>=4)score+=4;
+    scores.push({s,score,winners,len});
+  }
+  return scores.sort((a,b)=>b.score-a.score);
+}
+
+function chooseDeclarerPlannedLead(seat,legal){
+  if(!(seat===declarer||seat===dummy)||!legal.length)return null;
+  const chain=chooseDeclarerChainCard(seat,legal);
+  if(chain)return chain;
+  const high=declarerHighConfidencePlan(seat,legal);
+  if(high)return high.card;
+  // A medium-confidence plan is used only when there is no safe winner or
+  // finesse candidate. This preserves the existing engine's behavior.
+  const candidates=declarerPlanCandidates(seat,legal);
+  if(candidates.length && candidates[0].confidence>=0.72)return candidates[0].card;
+  const priorities=declarerPlanSuitPriority();
+  for(const p of priorities){
+    if(p.s===trump)continue;
+    const cards=legal.filter(c=>c.s===p.s);
+    if(cards.length&&p.winners>0)return cards.slice().sort((a,b)=>RV2(b.r)-RV2(a.r))[0];
+  }
+  if(trump){
+    const tc=legal.filter(c=>c.s===trump);
+    // Draw only when side-suit plan is exhausted and there are enough trumps
+    // to protect against immediate ruffs.
+    if(tc.length&&contractTrumpCount()>=6)return tc.slice().sort((a,b)=>RV2(b.r)-RV2(a.r))[0];
+  }
+  return null;
+}
+
+function chooseDeclarerPlannedFollow(seat,follow,curWin,partnerWinning){
+  if(!(seat===declarer||seat===dummy)||!follow.length)return null;
+  if(partnerWinning)return follow.slice().sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+  const winners=follow.filter(c=>cardBeats(c,curWin.card));
+  if(winners.length)return winners.slice().sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+  return follow.slice().sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+}
+
+function chooseCard(seat,h){
+  // ── AI DIFFICULTY ─────────────────────────────────────────
+  // The normal AI chooses from its own visible-information heuristics.
+  // DD is deliberately sampled according to the selected level.
+  // This makes stronger play an explicit game setting rather than an
+  // invisible "perfect information" behavior.
+  const ddRate=AI_DD_RATES[aiDifficulty] ?? 1;
+  if(ddRate>0 && Math.random()<ddRate){
+    const exact=ddGetBestMove(seat);
+    if(exact) return exact;
+  }
+
+  // ── Sezgisel AI motoru ────────────────────────────────────
   const legal=h.filter(c=>isLegal(seat,c));
   if(!legal.length) return h[0];
 
@@ -2669,9 +3984,13 @@ function chooseCard(seat,h){
   const partnerBids=currentTrick.filter(e=>e.seat===partner);
   const partnerLed=partnerBids.length>0?partnerBids[0].card.s:null;
 
-  // ── OPENING LEAD (veya sonraki her defans lead'i) ──────────
+  // ── LEAD: opening lead vs subsequent lead are different decisions ──
   if(currentTrick.length===0){
     if(isDef){
+      if(trickCount>0){
+        const sub=chooseSubsequentDefenderLead(seat,legal);
+        if(sub) return sub;
+      }
       // SLAM SAVUNMASI: 6/7 seviyeye karşı elde As varsa HEMEN çekilmeli.
       // (Beklemek riskli — declarer atarak Ası düşürebilir, tek şansı kaçırırız.)
       if(contractLevel>=6){
@@ -2695,7 +4014,10 @@ function chooseCard(seat,h){
       if(inSuit.length>=4) return inSuit[inSuit.length-4]||inSuit[inSuit.length-1];
       return inSuit[0];
     } else {
-      // Declarer/Dummy leads: longest suit, highest card
+      // Declarer/Dummy: use the plan layer first; generic longest-suit play
+      // is only the fallback when no useful plan candidate exists.
+      const planned=chooseDeclarerPlannedLead(seat,legal);
+      if(planned) return planned;
       const slen={};
       legal.forEach(cv=>{slen[cv.s]=(slen[cv.s]||0)+1;});
       const bestSuit=Object.keys(slen).sort((a,b)=>slen[b]-slen[a])[0];
@@ -2732,15 +4054,11 @@ function chooseCard(seat,h){
       // Cannot win — play lowest as signal
       return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
     } else {
-      // DECLARER/DUMMY: play efficiently
-      if(partnerWinning){
-        return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0]; // low, partner wins
-      }
-      const winning=follow.filter(cv=>cardBeats(cv,curWin.card));
-      if(winning.length){
-        return winning.sort((a,b)=>RV2(a.r)-RV2(b.r))[0]; // lowest winner
-      }
-      return follow.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+      // DECLARER/DUMMY: continue the multi-step declarer plan whenever the
+      // planned card is legal in the current trick.
+      const chain=chooseDeclarerChainCard(seat,follow);
+      if(chain)return chain;
+      return chooseDeclarerPlannedFollow(seat,follow,curWin,partnerWinning);
     }
   }
 
@@ -2765,9 +4083,9 @@ function chooseCard(seat,h){
 
   // ── C. Discard ────────────────────────────────────────────
   // Defender: discard from suit where partner didn\u2019t lead (keep partner\u2019s suit)
-  if(isDef&&partnerLed){
-    const notPartnerSuit=legal.filter(cv=>cv.s!==partnerLed&&cv.s!==trump);
-    if(notPartnerSuit.length) return notPartnerSuit.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
+  if(isDef){
+    const d=chooseDefensiveDiscard(seat,legal,partner);
+    if(d) return d;
   }
   return legal.sort((a,b)=>RV2(a.r)-RV2(b.r))[0];
 }
@@ -3003,24 +4321,29 @@ function showBidExplain(entry){
     }
   }
 
-  // ── Blackwood ─────────────────────────────────────────────
-  if(bid==='4NT'&&lastRealBid&&lastRealBid.bid!=='1NT'){
-    bidTag='4NT';
-    explanation='Blackwood — As sorgusu. Koz fiti bulundu, slem araştırıyor.';
+  // ── 4NT / RKCB ────────────────────────────────────────────
+  if(bid==='4NT'){
+    if(lastBlackwood()===entry){
+      bidTag='4NT';
+      explanation='RKCB 1430 — 4 As + koz Papazı (5 Key Card) sorgusu.';
+    }else{
+      bidTag='4NT';
+      explanation='Quantitative 4NT — dengeli el ile şlem daveti; Key Card sorgusu değil.';
+    }
     _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
     return;
   }
   const bw=lastBlackwood();
-  if(!entry.isX&&!entry.isXX&&parseInt(bid[0])===5&&bw){
-    const acesShown={'♣':'0 veya 4','♦':'1','♥':'2','♠':'3'}[bid.slice(1)]||'?';
+  if(!entry.isX&&!entry.isXX&&parseInt(bid[0])===5&&bw&&history.indexOf(entry)>history.indexOf(bw)){
+    const map={'C':'1 veya 4','D':'0 veya 3','H':'2, koz Q yok','S':'2, koz Q var'};
     bidTag=bid;
-    explanation='Blackwood cevabı — '+acesShown+' As.';
+    explanation='RKCB 1430 cevabı — '+(map[suitOf(bid)]||'Key Card cevabı')+'.';
     _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
     return;
   }
-  if(bid==='5NT'){
+  if(bid==='5NT' && lastFiveNT()===entry){
     bidTag='5NT';
-    explanation='Kral sorgusu — kaç Kral var? (5NT sonrası 6♣=0K, 6♦=1K, 6♥=2K, 6♠=3K, 6NT=4K)';
+    explanation='5NT — RKCB sonrası yan renk Papazları sorgulanıyor; koz Papazı zaten Key Card.';
     _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
     return;
   }
@@ -3028,7 +4351,7 @@ function showBidExplain(entry){
   if(!entry.isX&&!entry.isXX&&parseInt(bid[0])===6&&fn){
     const kingsShown={'♣':'0','♦':'1','♥':'2','♠':'3','NT':'4'}[bid.slice(1)]||'?';
     bidTag=bid;
-    explanation='5NT cevabı — '+kingsShown+' Kral.';
+    explanation='5NT cevabı — yan renk Papazları.';
     _appendExplain(panel,seatInitial,sideClass,bidTag,explanation);
     return;
   }
@@ -3167,9 +4490,8 @@ function seatNameShort(s){return{N:'Kuzey',E:'Doğu',S:'Güney',W:'Batı'}[s]||s
 /* ════════════════════════════════════════════════════
    START
 ════════════════════════════════════════════════════ */
-startGame();
-</script>
-<script>
+
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW kayıt hatası:', err));
@@ -3208,6 +4530,7 @@ window.addEventListener('resize', fitToScreen);
 window.addEventListener('orientationchange', () => setTimeout(fitToScreen, 200));
 // Oyun akışı DOM'u sık sık günceller (yeni el, oyun fazı vb.) — periyodik olarak da kontrol et
 setInterval(fitToScreen, 1000);
+
 </script>
 </body>
 </html>
